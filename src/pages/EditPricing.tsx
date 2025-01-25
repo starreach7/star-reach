@@ -4,6 +4,7 @@ import { ArrowLeft, DollarSign, Clock, Info, Video, MessageCircle, Building2 } f
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import DateTimeSelector from '../components/onboarding/DateTimeSelector';
+import { useAuth } from '../store/authStore';
 
 const validationSchema = Yup.object().shape({
   services: Yup.array()
@@ -34,6 +35,11 @@ const validationSchema = Yup.object().shape({
 });
 
 const EditPricing = () => {
+    const { user } = useAuth();
+
+    console.log(user);
+    
+  
   const [showAvailability, setShowAvailability] = useState(false);
 
   const initialValues = {

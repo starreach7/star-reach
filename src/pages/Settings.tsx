@@ -8,12 +8,14 @@ import SecuritySection from '../components/accountSettings/SecuritySection';
 
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string()
+  firstName: Yup.string()
     .min(2, 'Name is too short')
     .max(50, 'Name is too long')
     .required('Name is required'),
-  country: Yup.string()
-    .required('Country is required'),
+    lastName: Yup.string()
+    .min(2, 'Name is too short')
+    .max(50, 'Name is too long')
+    .required('Name is required'),
   newPassword: Yup.string()
     .min(8, 'Password must be at least 8 characters'),
   confirmPassword: Yup.string()
@@ -60,9 +62,9 @@ const Settings = () => {
             <h2 className="text-2xl font-bold text-white mb-6">Account Settings</h2>
             <Formik
               initialValues={{
-                name: user?.fullName || '',
+                firstName: user?.firstName || '',
+                lastName: user?.lastName || '',
                 email: user?.email || '',
-                country: '',
                 newPassword: '',
                 confirmPassword: '',
                 twoFactorEnabled: false
