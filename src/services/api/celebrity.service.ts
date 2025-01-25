@@ -29,7 +29,7 @@ class CelebrityService {
       
       // Append profile setup data
       // formData.append('categoryId', data.category);
-      formData.append('categoryId', "17a0b1cf-0880-4f02-bb8c-126e53856ae5");
+      formData.append('categoryId', data.category);
 
       formData.append('bio', data.bio);
 

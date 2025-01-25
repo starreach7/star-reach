@@ -15,17 +15,17 @@ const resetPasswordSchema = Yup.object().shape({
 });
 
 const ResetPassword = () => {
-  const { token } = useParams();
+  const { sessionToken } = useParams();
   const { resetPassword, loading, error, success, clearError } = useResetPassword();
 
-  if (!token) {
+  if (!sessionToken) {
     return <Navigate to="/forgot-password" />;
   }
 
   const handleSubmit = async (values: { password: string; confirmPassword: string }) => {
     try {
       clearError();
-      await resetPassword(token, values.password);
+      await resetPassword(sessionToken, values.password);
     } catch (err) {
       console.error('Password reset failed:', err);
     }

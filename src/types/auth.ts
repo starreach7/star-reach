@@ -32,6 +32,7 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   categories: any[];
+  profileImage:string
   // The interface can be extended as the user object grows
 }
 

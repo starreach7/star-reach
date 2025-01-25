@@ -58,15 +58,16 @@ class AuthService {
 
   async forgotPassword(email: string): Promise<void> {
     try {
-      await api.post('/auth/forgot-password', { email });
+      await api.post('/auth/send-email', { email });
     } catch (error) {
       throw this.handleError(error);
     }
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<void> {
+
+  async resetPassword(sessionToken: string, password: string): Promise<void> {
     try {
-      await api.post('/auth/reset-password', { token, newPassword });
+      await api.post('/auth/reset-password', { sessionToken, password });
     } catch (error) {
       throw this.handleError(error);
     }

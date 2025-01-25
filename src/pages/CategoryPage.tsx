@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { allCelebrities, categories } from '../data/mockData';
+import { allCelebrities } from '../data/mockData';
 import CelebrityCard from '../components/CelebrityCard';
 import { useFilters } from '../hooks/useFilters';
 import FilterSidebar from '../commonComponents/FilterSidebar';
+import { useCategories } from '../store/categoryStore';
 
 const CategoryPage = () => {
   const { categoryId } = useParams();
   const [showFilters, setShowFilters] = useState(false);
+  const { categories, loading: categoriesLoading, error: categoriesError, fetchCategories } = useCategories();
   
-  const category = categories.find(c => c.id === Number(categoryId));
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
+  const category = categories.find(c => c.id === Number(categoryId));
   const categoryCelebrities = allCelebrities.filter(celeb => celeb.category === category?.name);
 
   const {
@@ -26,8 +31,25 @@ const CategoryPage = () => {
 
   const filteredCelebrities = filterCelebrities(categoryCelebrities);
 
-  if (!category) {
-    return <div>Category not found</div>;
+  if (categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="h-8 w-48 bg-gray-800 rounded animate-pulse"></div>
+          <div className="h-4 w-64 bg-gray-800 rounded animate-pulse mt-4"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (categoriesError || !category) {
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <p className="text-red-500">Category not found</p>
+        </div>
+      </div>
+    );
   }
 
   return (

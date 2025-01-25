@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tag } from 'lucide-react';
 import { FormikProps } from 'formik';
+import { useCategories } from '../../store/categoryStore';
 
 interface ProfileSetupFormProps {
   formik: FormikProps<{
@@ -13,20 +14,12 @@ interface ProfileSetupFormProps {
 }
 
 const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({ formik, onBack, onNext }) => {
-  const categories = [
-    'Actors',
-    'Musicians',
-    'Athletes',
-    'Comedians',
-    'Influencers',
-    'TV Personalities',
-    'Authors',
-    'Chefs',
-    'Business Leaders',
-    'Other',
-  ];
+  
+  const { categories, fetchCategories} = useCategories();
 
-
+    useEffect(() => {
+      fetchCategories();
+    }, [fetchCategories]);
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && e.currentTarget.value) {
@@ -64,9 +57,9 @@ const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({ formik, onBack, onN
           className="block w-full px-3 py-2.5 border border-gray-600 rounded-lg bg-gray-700/50 text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
         >
           <option value="">Select your category</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
+          {categories.map((category, index) => (
+            <option key={index} value={category.id}>
+              {category.name}
             </option>
           ))}
         </select>

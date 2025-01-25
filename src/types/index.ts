@@ -21,7 +21,7 @@ export interface Celebrity {
 export interface Category {
   id: number;
   name: string;
-  icon: string;
+  // icon: string;
   description: string;
   celebrityCount: number;
 }

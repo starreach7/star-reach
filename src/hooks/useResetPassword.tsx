@@ -7,12 +7,12 @@ export const useResetPassword = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const resetPassword = async (token: string, newPassword: string) => {
+  const resetPassword = async (sessionToken: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
       setSuccess(false);
-      await AuthService.resetPassword(token, newPassword);
+      await AuthService.resetPassword(sessionToken, password);
       setSuccess(true);
       showSuccessToast('Your password has been reset successfully!');
     } catch (err) {

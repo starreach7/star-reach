@@ -2,7 +2,8 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { ArrowLeft, Upload, X } from 'lucide-react';
-import { categories } from '../data/mockData';
+import { useCategories } from '../store/categoryStore';
+import { useEffect } from 'react';
 
 const validationSchema = Yup.object().shape({
   promotionalVideo: Yup.mixed(),
@@ -21,6 +22,11 @@ const validationSchema = Yup.object().shape({
 
 const EditProfile = () => {
   const { id } = useParams();
+  const { categories, loading, error, fetchCategories } = useCategories();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const initialValues = {
     promotionalVideo: '',
@@ -34,8 +40,28 @@ const EditProfile = () => {
   const handleSubmit = (values: any) => {
     console.log('Profile updated:', values);
   };
-  const category = categories;
+
   const responseTimes = ['1 hour', '2 hours', '6 hours', '12 hours', '24 hours'];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="h-8 w-48 bg-gray-800 rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          <p className="text-red-500">Failed to load categories</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -126,7 +152,8 @@ const EditProfile = () => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
                       >
-                        {category.map((cat) => (
+                        <option value="">Select category</option>
+                        {categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>
                             {cat.name}
                           </option>

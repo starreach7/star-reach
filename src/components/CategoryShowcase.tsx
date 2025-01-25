@@ -1,11 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Category } from '../types';
 import { Clapperboard, Music, Trophy, TrendingUp, Laugh, Tv } from 'lucide-react';
-
-interface CategoryShowcaseProps {
-  categories: Category[];
-}
+import { useCategories } from '../store/categoryStore';
 
 const iconMap: { [key: string]: any } = {
   clapperboard: Clapperboard,
@@ -16,7 +12,41 @@ const iconMap: { [key: string]: any } = {
   tv: Tv,
 };
 
-const CategoryShowcase = ({ categories }: CategoryShowcaseProps) => {
+const CategoryShowcase = () => {
+  const { categories, loading, error, fetchCategories } = useCategories();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="h-8 w-48 bg-gray-800 rounded animate-pulse mx-auto"></div>
+            <div className="h-4 w-64 bg-gray-800 rounded animate-pulse mx-auto mt-4"></div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-40 bg-gray-800 rounded-xl animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-20 bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-red-500">Failed to load categories</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,7 +58,7 @@ const CategoryShowcase = ({ categories }: CategoryShowcaseProps) => {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category) => {
-            const IconComponent = iconMap[category.icon];
+            // const IconComponent = iconMap[category.icon];
             return (
               <Link
                 key={category.id}
@@ -38,7 +68,7 @@ const CategoryShowcase = ({ categories }: CategoryShowcaseProps) => {
                 <div className="absolute inset-0 bg-gradient-to-b from-emerald-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative z-10">
                   <div className="mx-auto mb-4 w-12 h-12 bg-emerald-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <IconComponent className="w-6 h-6 text-emerald-400" />
+                    <TrendingUp className="w-6 h-6 text-emerald-400" />
                   </div>
                   <h3 className="text-lg font-semibold mb-1">{category.name}</h3>
                   <p className="text-sm text-gray-400">{category.celebrityCount} creators</p>
