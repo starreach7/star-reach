@@ -67,6 +67,14 @@ class CelebrityService {
     }
   }
 
+  async updatePricing(data: any): Promise<void> {
+    try {
+      await api.put('/celebrity', data);
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   private handleError(error: any): Error {
     if (error.response) {
       throw new Error(error.response.data.message || 'An error occurred');

@@ -5,6 +5,8 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import DateTimeSelector from '../components/onboarding/DateTimeSelector';
 import { useAuth } from '../store/authStore';
+import CelebrityService from '../services/api/celebrity.service';
+import { showSuccessToast, showErrorToast } from '../utils/toast';
 
 const validationSchema = Yup.object().shape({
   services: Yup.array()
@@ -35,23 +37,22 @@ const validationSchema = Yup.object().shape({
 });
 
 const EditPricing = () => {
-    const { user } = useAuth();
-
-    console.log(user);
-    
-  
-  const [showAvailability, setShowAvailability] = useState(false);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [showAvailability, setShowAvailability] = useState(
+    user?.celebrity?.services?.includes('meetingPrice') || false
+  );
 
   const initialValues = {
-    services: ['personalVideoPrice'],
-    personalVideoPrice: 50,
-    businessVideoPrice: '',
-    meetingPrice: '',
-    responseTime: '24 hours',
-    availability: []
+    services: user?.celebrity?.services || ['personalVideoPrice'],
+    personalVideoPrice: user?.celebrity?.personalVideoPrice || '',
+    businessVideoPrice: user?.celebrity?.businessVideoPrice || '',
+    meetingPrice: user?.celebrity?.meetingPrice || '',
+    responseTime: user?.celebrity?.responseTime || 'TwentyFourHours',
+    availability: user?.celebrity?.availability || []
   };
 
-  const responseTimes = ['1 hour', '2 hours', '6 hours', '12 hours', '24 hours', '48 hours'];
+  const responseTimes = ['TwentyFourHours', 'FortyEightHours', 'ThreeDays', 'OneWeek'];
 
   const services = [
     {
@@ -77,8 +78,16 @@ const EditPricing = () => {
     }
   ];
 
-  const handleSubmit = (values: any) => {
-    console.log('Pricing updated:', values);
+  const handleSubmit = async (values: any) => {
+    try {
+      setLoading(true);
+      await CelebrityService.updatePricing(values);
+      showSuccessToast('Pricing updated successfully!');
+    } catch (error) {
+      showErrorToast((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -252,9 +261,10 @@ const EditPricing = () => {
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+                      disabled={loading}
+                      className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Save Changes
+                      {loading ? 'Saving Changes...' : 'Save Changes'}
                     </button>
                   </div>
                 </Form>

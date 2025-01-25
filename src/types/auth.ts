@@ -19,6 +19,35 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+export interface Celebrity {
+  id: string;
+  bio: string;
+  categoryId: string;
+  createdAt: string;
+  currency: string;
+  email: string;
+  fullName: string;
+  idDocument: string;
+  idType: string;
+  largestFollowingCount: string;
+  largestFollowingPlatform: string;
+  largestFollowingUsername: string;
+  location: string;
+  profileImage: string;
+  promotionalVideo: string | null;
+  responseTime: string;
+  services: string[];
+  personalVideoPrice:string;
+  businessVideoPrice:string;
+  meetingPrice:string;
+  socialPlatformLink: string;
+  status: string;
+  tags: string[];
+  updatedAt: string;
+  userId: string;
+  availability: { date: string; timeSlots: any[] }[];
+}
+
 export interface User {
   id: string;
   role: string;
@@ -32,9 +61,10 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   categories: any[];
-  profileImage:string
-  // The interface can be extended as the user object grows
+  profileImage: string;
+  celebrity?: Celebrity; // Optional property for celebrity details
 }
+
 
 export interface UserResponse {
   data: User;
