@@ -46,13 +46,13 @@ const EditPricing = () => {
   const initialValues = {
     services: user?.celebrity?.services || ['personalVideoPrice'],
     personalVideoPrice: user?.celebrity?.personalVideoPrice 
-      ? Math.floor(user.celebrity.personalVideoPrice) 
+      ? Math.round(user.celebrity.personalVideoPrice) 
       : '',
     businessVideoPrice: user?.celebrity?.businessVideoPrice 
-      ? Math.floor(user.celebrity.businessVideoPrice) 
+      ? Math.round(user.celebrity.businessVideoPrice) 
       : '',
     meetingPrice: user?.celebrity?.meetingPrice 
-      ? Math.floor(user.celebrity.meetingPrice) 
+      ? Math.round(user.celebrity.meetingPrice) 
       : '',
     responseTime: user?.celebrity?.responseTime || 'TwentyFourHours',
     availability: user?.celebrity?.availability || []
