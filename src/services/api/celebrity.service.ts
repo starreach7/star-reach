@@ -125,6 +125,10 @@ class CelebrityService {
   async updatePricing(data: any): Promise<void> {
     try {
       await api.put('/celebrity', data);
+      const user = await AuthService.getCurrentUser();   
+      
+      useAuth.getState().updateUser(user);
+
     } catch (error) {
       throw this.handleError(error);
     }
