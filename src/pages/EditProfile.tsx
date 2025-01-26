@@ -1,14 +1,16 @@
-import { useParams, Navigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import { useCategories } from '../store/categoryStore';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../store/authStore';
+import CelebrityService from '../services/api/celebrity.service';
+import { showSuccessToast, showErrorToast } from '../utils/toast';
 
 const validationSchema = Yup.object().shape({
   promotionalVideo: Yup.mixed(),
-  occupation: Yup.string().required('Occupation is required'),
-  category: Yup.string().required('Category is required'),
+  categoryId: Yup.string().required('Category is required'),
   bio: Yup.string()
     .min(50, 'Bio must be at least 50 characters')
     .max(300, 'Bio cannot exceed 300 characters')
@@ -21,29 +23,50 @@ const validationSchema = Yup.object().shape({
 });
 
 const EditProfile = () => {
-  const { id } = useParams();
-  const { categories, loading, error, fetchCategories } = useCategories();
+  const { categories, loading: categoriesLoading, error: categoriesError, fetchCategories } = useCategories();
+  const { user } = useAuth();
+
+  console.log(user, "userss");
+  
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
   const initialValues = {
-    promotionalVideo: '',
-    occupation: '',
-    category: '',
-    bio:  '',
-    tags:  [],
-    responseTime:  '',
+    promotionalVideo: user?.celebrity?.promotionalVideo || '',
+    categoryId: user?.celebrity?.categoryId || '',
+    bio: user?.celebrity?.bio || '',
+    tags: user?.celebrity?.tags || [],
+    responseTime: user?.celebrity?.responseTime || '',
   };
 
-  const handleSubmit = (values: any) => {
-    console.log('Profile updated:', values);
+  const handleSubmit = async (values: any) => {
+    try {
+      setIsUploading(true);
+      await CelebrityService.updateProfile({
+        ...values,
+        promotionalVideo: values.promotionalVideo, // File object or existing URL
+        onUploadProgress: (progressEvent: any) => {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(progress);
+        },
+      });
+      showSuccessToast('Profile updated successfully');
+    } catch (error) {
+      showErrorToast((error as Error).message);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
+  
 
-  const responseTimes = ['1 hour', '2 hours', '6 hours', '12 hours', '24 hours'];
+  const responseTimes = ['TwentyFourHours', 'FortyEightHours', 'ThreeDays', 'OneWeek'];
 
-  if (loading) {
+  if (categoriesLoading) {
     return (
       <div className="min-h-screen bg-gray-900 py-12">
         <div className="max-w-3xl mx-auto px-4">
@@ -53,7 +76,7 @@ const EditProfile = () => {
     );
   }
 
-  if (error) {
+  if (categoriesError) {
     return (
       <div className="min-h-screen bg-gray-900 py-12">
         <div className="max-w-3xl mx-auto px-4">
@@ -70,7 +93,7 @@ const EditProfile = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link
-              to={`/profile/${id}`}
+              to="/profile"
               className="flex items-center text-gray-400 hover:text-white group"
             >
               <ArrowLeft className="h-5 w-5 mr-2 transform group-hover:-translate-x-1 transition-transform" />
@@ -90,6 +113,7 @@ const EditProfile = () => {
               initialValues={initialValues}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
+              enableReinitialize
             >
               {({ values, errors, touched, setFieldValue, handleChange }) => (
                 <Form className="space-y-6">
@@ -100,67 +124,79 @@ const EditProfile = () => {
                     </label>
                     <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-lg hover:border-primary-500 transition-colors">
                       <div className="space-y-1 text-center">
-                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                        <div className="flex text-sm text-gray-400">
-                          <label className="relative cursor-pointer rounded-md font-medium text-primary-500 hover:text-primary-400">
-                            <span>Upload a video</span>
-                            <input
-                              type="file"
-                              name="promotionalVideo"
-                              accept="video/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                setFieldValue('promotionalVideo', file);
-                              }}
-                              className="sr-only"
+                        {values.promotionalVideo ? (
+                          <div className="relative">
+                            <video
+                              src={typeof values.promotionalVideo === 'string' ? values.promotionalVideo : URL.createObjectURL(values.promotionalVideo)}
+                              className="max-w-full h-48 rounded"
+                              controls
                             />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500">MP4, MOV up to 50MB</p>
+                            <button
+                              type="button"
+                              onClick={() => setFieldValue('promotionalVideo', '')}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="flex text-sm text-gray-400">
+                              <label className="relative cursor-pointer rounded-md font-medium text-primary-500 hover:text-primary-400">
+                                <span>Upload a video</span>
+                                <input
+                                  type="file"
+                                  name="promotionalVideo"
+                                  accept="video/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    setFieldValue('promotionalVideo', file);
+                                  }}
+                                  className="sr-only"
+                                />
+                              </label>
+                              <p className="pl-1">or drag and drop</p>
+                            </div>
+                            <p className="text-xs text-gray-500">MP4, MOV up to 50MB</p>
+                          </>
+                        )}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Occupation */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Occupation
-                    </label>
-                    <input
-                      type="text"
-                      name="occupation"
-                      value={values.occupation}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-primary-500"
-                      placeholder="e.g. Professional Photographer"
-                    />
-                    {touched.occupation && errors.occupation && (
-                      <p className="mt-1 text-sm text-red-500">{errors.occupation}</p>
+                    {isUploading && (
+                      <div className="mt-2">
+                        <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-sm text-gray-400 mt-1">Uploading: {uploadProgress}%</p>
+                      </div>
                     )}
                   </div>
 
-                  {/* Category and Subcategory */}
-                  <div >
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Category
-                      </label>
-                      <select
-                        name="category"
-                        value={values.category}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
-                      >
-                        <option value="">Select category</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  
+                  {/* Category */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Category
+                    </label>
+                    <select
+                      name="categoryId"
+                      value={values.categoryId}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
+                    >
+                      <option value="">Select category</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                    {touched.categoryId && errors.categoryId && (
+                      <p className="mt-1 text-sm text-red-500">{errors.categoryId}</p>
+                    )}
                   </div>
 
                   {/* Bio */}
@@ -248,16 +284,19 @@ const EditProfile = () => {
                         </option>
                       ))}
                     </select>
+                    {touched.responseTime && errors.responseTime && (
+                      <p className="mt-1 text-sm text-red-500">{errors.responseTime}</p>
+                    )}
                   </div>
 
-                
                   {/* Submit Button */}
                   <div className="pt-6 border-t border-gray-700">
                     <button
                       type="submit"
-                      className="w-full sm:w-auto px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+                      disabled={isUploading}
+                      className="w-full sm:w-auto px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Save Changes
+                      {isUploading ? 'Saving Changes...' : 'Save Changes'}
                     </button>
                   </div>
                 </Form>

@@ -1,5 +1,7 @@
 import api from './axios';
+import AuthService from './auth.service'; // Import AuthService
 import { CelebrityOnboardingData } from '../../types/celebrity';
+import { useAuth } from '../../store/authStore';
 
 class CelebrityService {
   async onboard(data: CelebrityOnboardingData): Promise<void> {
@@ -9,7 +11,6 @@ class CelebrityService {
       // Append basic info
       formData.append('fullName', data.fullName);
       formData.append('email', data.email);
-      // formData.append('phone', data.phone);
       formData.append('location', data.location);
       
       // Append profile image if exists
@@ -28,9 +29,7 @@ class CelebrityService {
       formData.append('largestFollowingCount', data.largestFollowingCount);
       
       // Append profile setup data
-      // formData.append('categoryId', data.category);
       formData.append('categoryId', data.category);
-
       formData.append('bio', data.bio);
 
       data.tags.forEach((tag: string) => {
@@ -66,6 +65,62 @@ class CelebrityService {
       throw this.handleError(error);
     }
   }
+
+  async uploadFile(file: File): Promise<string> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      const response = await api.post('/common/upload-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      // Assuming the API returns the file as a string in `data.fileUrl`
+      console.log(response.data);
+      return response.data;
+      
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+  
+  async updateProfile(data: any): Promise<{ user: any }> {
+    try {  
+      if (data.promotionalVideo instanceof File) {
+        const videoUrl = await this.uploadFile(data.promotionalVideo);        
+        data.promotionalVideo = videoUrl; // Update with the returned URL
+      }
+  
+      const formData = new FormData();
+      formData.append('promotionalVideo', data.promotionalVideo.data ? data.promotionalVideo.data : data.promotionalVideo || ''); // Use string or fallback to empty
+      formData.append('categoryId', data.categoryId);
+      formData.append('bio', data.bio);
+  
+      data.tags.forEach((tag: string) => {
+        formData.append('tags', tag);
+      });
+  
+      formData.append('responseTime', data.responseTime);
+  
+      await api.put('/celebrity', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: data.onUploadProgress,
+      });
+  
+      // Fetch the updated user profile
+      const user = await AuthService.getCurrentUser();   
+      
+      useAuth.getState().updateUser(user);
+
+      return { user };
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+  
 
   async updatePricing(data: any): Promise<void> {
     try {
