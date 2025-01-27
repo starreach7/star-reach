@@ -3,6 +3,16 @@ import AuthService from './auth.service'; // Import AuthService
 import { CelebrityOnboardingData } from '../../types/celebrity';
 import { useAuth } from '../../store/authStore';
 
+interface GetCelebritiesParams {
+  page: number;
+  search?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  ratings?: number[];
+  sortBy?: string;
+}
+
+
 class CelebrityService {
   async onboard(data: CelebrityOnboardingData): Promise<void> {
     try {
@@ -85,9 +95,32 @@ class CelebrityService {
     }
   }
 
-  async getAllCelebrities(page: number = 1) {
+  async getAllCelebrities(params: GetCelebritiesParams) {
     try {
-      const response = await api.get(`/user/celebrities?page=${page}`);
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', params.page.toString());
+      
+      if (params.search) {
+        queryParams.append('search', params.search);
+      }
+      
+      if (params.minPrice) {
+        queryParams.append('minPrice', params.minPrice);
+      }
+      
+      if (params.maxPrice) {
+        queryParams.append('maxPrice', params.maxPrice);
+      }
+      
+      if (params.ratings && params.ratings.length > 0) {
+        queryParams.append('ratings', params.ratings.join(','));
+      }
+      
+      if (params.sortBy) {
+        queryParams.append('sortBy', params.sortBy);
+      }
+
+      const response = await api.get(`/user/celebrities?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);

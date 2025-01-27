@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import CelebrityCard from '../components/CelebrityCard';
-import { useFilters } from '../hooks/useFilters';
 import FilterSidebar from '../commonComponents/FilterSidebar';
 import { useQuery } from '@tanstack/react-query';
 import CelebrityService from '../services/api/celebrity.service';
@@ -12,24 +11,28 @@ const Explore = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState({ min: '', max: '' });
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+  const [selectedSort, setSelectedSort] = useState('');
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['celebrities', currentPage + 1],
-    queryFn: () => CelebrityService.getAllCelebrities(currentPage + 1),
+    queryKey: ['celebrities', currentPage + 1, searchQuery, selectedPriceRange, selectedRatings, selectedSort],
+    queryFn: () => CelebrityService.getAllCelebrities({
+      page: currentPage + 1,
+      search: searchQuery || undefined,
+      minPrice: selectedPriceRange.min || undefined,
+      maxPrice: selectedPriceRange.max || undefined,
+      ratings: selectedRatings.length > 0 ? selectedRatings : undefined,
+      sortBy: selectedSort || undefined
+    }),
   });
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected);
   };
 
-  const handlePriceRangeChange = (range: string) => {
-    setSelectedPriceRanges(prev =>
-      prev.includes(range)
-        ? prev.filter(r => r !== range)
-        : [...prev, range]
-    );
+  const handlePriceRangeChange = (range: { min: string; max: string }) => {
+    setSelectedPriceRange(range);
   };
 
   const handleRatingChange = (rating: number) => {
@@ -40,30 +43,14 @@ const Explore = () => {
     );
   };
 
-  const filterCelebrities = (celebrities: ApiCelebrity[]) => {
-    return celebrities.filter(celebrity => {
-      // Search filter
-      const matchesSearch = searchQuery === '' ||
-        celebrity.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        celebrity.categoryName.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Price range filter
-      const matchesPriceRange = selectedPriceRanges.length === 0 ||
-        selectedPriceRanges.some(range => {
-          const [min, max] = range.split('-').map(n => n === 'plus' ? Infinity : Number(n));
-          const price = parseFloat(celebrity.price);
-          return price >= min && price <= max;
-        });
-
-      // Rating filter
-      const matchesRating = selectedRatings.length === 0 ||
-        selectedRatings.some(rating => celebrity.averageRating >= rating);
-
-      return matchesSearch && matchesPriceRange && matchesRating;
-    });
+  const handleSortChange = (sort: string) => {
+    setSelectedSort(sort === selectedSort ? '' : sort);
   };
 
-  const filteredCelebrities = data?.data ? filterCelebrities(data.data) : [];
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(0); // Reset to first page when searching
+  };
 
   if (error) {
     return (
@@ -87,7 +74,7 @@ const Explore = () => {
                 type="text"
                 placeholder="Search celebrities..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearch}
                 className="w-full bg-gray-800 border-none rounded-lg py-3 pl-12 pr-4 text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500"
               />
               <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
@@ -106,10 +93,12 @@ const Explore = () => {
           {/* Filters Sidebar */}
           <div className={`lg:w-1/4 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <FilterSidebar
-              selectedPriceRanges={selectedPriceRanges}
+              selectedPriceRange={selectedPriceRange}
               selectedRatings={selectedRatings}
+              selectedSort={selectedSort}
               onPriceRangeChange={handlePriceRangeChange}
               onRatingChange={handleRatingChange}
+              onSortChange={handleSortChange}
             />
           </div>
 
@@ -123,14 +112,14 @@ const Explore = () => {
                   </div>
                 ))}
               </div>
-            ) : filteredCelebrities.length === 0 ? (
+            ) : data?.data.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-400 text-lg">No celebrities found matching your criteria.</p>
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredCelebrities.map((celebrity) => (
+                  {data?.data.map((celebrity: ApiCelebrity) => (
                     <CelebrityCard
                       key={celebrity.celebrityId}
                       celebrity={{
@@ -154,10 +143,10 @@ const Explore = () => {
 
                 <div className="mt-8">
                   <ReactPaginate
-                  forcePage={currentPage}
+                    forcePage={currentPage}
                     previousLabel="Previous"
                     nextLabel="Next"
-                    pageCount={2} // You might want to get this from the API response
+                    pageCount={data?.totalPages || 2}
                     onPageChange={handlePageChange}
                     containerClassName="flex justify-center items-center space-x-2"
                     previousClassName="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
