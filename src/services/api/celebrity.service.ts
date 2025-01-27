@@ -84,6 +84,15 @@ class CelebrityService {
       throw this.handleError(error);
     }
   }
+
+  async getAllCelebrities(page: number = 1) {
+    try {
+      const response = await api.get(`/user/celebrities?page=${page}`);
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
   
   async updateProfile(data: any): Promise<{ user: any }> {
     try {  

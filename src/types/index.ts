@@ -10,18 +10,27 @@ export interface Celebrity {
   languages?: string[];
   tags?: string[];
   reviews?: number;
-  bookings:number
-  stats:{
-    completed: string,
-      avgResponse: string,
-      joinedDate: string,
-  }
+  bookings: number;
+  stats: {
+    completed: string;
+    avgResponse: string;
+    joinedDate: string;
+  };
+}
+
+export interface ApiCelebrity {
+  celebrityId: string;
+  userId: string;
+  profileImage: string;
+  fullName: string;
+  averageRating: number;
+  price: string;
+  categoryName: string;
 }
 
 export interface Category {
   id: number;
   name: string;
-  // icon: string;
   description: string;
   celebrityCount: number;
 }
