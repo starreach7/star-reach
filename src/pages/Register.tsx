@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Calendar } from 'lucide-react';
 import { useAuth } from '../store/authStore';

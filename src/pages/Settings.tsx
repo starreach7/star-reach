@@ -5,30 +5,48 @@ import { Formik, Form } from 'formik';
 import ProfileImageUpload from '../components/accountSettings/ProfileImageUpload';
 import ProfileForm from '../components/accountSettings/ProfileForm';
 import SecuritySection from '../components/accountSettings/SecuritySection';
+import userService from '../services/api/user.service';
+import { showSuccessToast } from '../utils/toast';
 
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string()
-    .min(2, 'Name is too short')
-    .max(50, 'Name is too long')
-    .required('Name is required'),
-    lastName: Yup.string()
-    .min(2, 'Name is too short')
-    .max(50, 'Name is too long')
-    .required('Name is required'),
+    .min(2, 'First name is too short')
+    .max(50, 'First name is too long')
+    .required('First name is required'),
+  lastName: Yup.string()
+    .min(2, 'Last name is too short')
+    .max(50, 'Last name is too long')
+    .required('Last name is required'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  userName: Yup.string()
+    .min(3, 'Username must be at least 3 characters')
+    .max(30, 'Username cannot exceed 30 characters')
+    .required('Username is required'),
+  gender: Yup.string()
+    .required('Gender is required'),
+  dateOfBirth: Yup.date()
+    .nullable()
+    .required('Date of birth is required'),
   newPassword: Yup.string()
-    .min(8, 'Password must be at least 8 characters'),
+    .min(8, 'Password must be at least 8 characters')
+    .notRequired(), // Optional unless provided
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
-  twoFactorEnabled: Yup.boolean()
 });
+
 
 const Settings = () => {
   const { user } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profile, setProfile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    setProfile(file)
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -40,10 +58,20 @@ const Settings = () => {
 
   const handleSubmit = async (values: any) => {
     try {
-      console.log('Form submitted:', values);
+      const payload = {
+        ...values,
+        profile, // Include the Base64 string
+      };
+      console.log('Form submitted:', payload);
+
+      setLoading(true);
+      await userService.updateUser(payload);
+      showSuccessToast('User updated successfully!');
       // Here you would typically update the user's profile
+      setLoading(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      setLoading(false);
+      console.error('Error updating User:', error);
     }
   };
 
@@ -65,9 +93,11 @@ const Settings = () => {
                 firstName: user?.firstName || '',
                 lastName: user?.lastName || '',
                 email: user?.email || '',
+                userName: user?.username || '',
+                gender: user?.gender || '',
+                dateOfBirth: user?.dateOfBirth || '',
                 newPassword: '',
                 confirmPassword: '',
-                twoFactorEnabled: false
               }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
@@ -81,16 +111,17 @@ const Settings = () => {
                   />
 
                   <ProfileForm errors={errors} touched={touched} />
-                  
+
                   <SecuritySection errors={errors} touched={touched} />
 
                   {/* Save Button */}
                   <div className="flex justify-end space-x-4">
                     <button
                       type="submit"
-                      className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
+                      disabled={loading}
+                      className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Save changes
+                      {loading ? 'Saving Changes...' : 'Save Changes'}
                     </button>
                   </div>
                 </Form>

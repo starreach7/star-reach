@@ -44,18 +44,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ errors, touched }) =>
           <div className="mt-1 text-sm text-red-500">{errors.confirmPassword}</div>
         )}
       </div>
-
-      <div className="flex items-center justify-between py-4 border-t border-gray-700">
-        <div>
-          <h3 className="text-sm font-medium text-white">Two-Step Authentication</h3>
-          <p className="text-sm text-gray-400">Add an extra layer of security to your account</p>
-        </div>
-        <Field
-          type="checkbox"
-          name="twoFactorEnabled"
-          className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-        />
-      </div>
     </div>
   );
 };

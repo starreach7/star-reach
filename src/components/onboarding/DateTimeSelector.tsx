@@ -3,6 +3,7 @@ import { Calendar as CalendarIcon, X, Plus, Calendar, Clock } from 'lucide-react
 import { format } from 'date-fns';
 
 interface TimeSlot {
+  timeSlotId?: string;
   start: string;
   end: string;
 }
@@ -12,11 +13,25 @@ interface DateAvailability {
   timeSlots: TimeSlot[];
 }
 
-const DateTimeSelector = ({ setFieldValue }: any) => {
-  const [selectedDates, setSelectedDates] = useState<DateAvailability[]>([]);
+interface DateTimeSelectorProps {
+  setFieldValue: (field: string, value: any) => void;
+  initialAvailability?: DateAvailability[];
+}
+
+const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, initialAvailability }) => {
+
+  console.log(initialAvailability, 'initialAvailability');
+
+  const [selectedDates, setSelectedDates] = useState<DateAvailability[]>(initialAvailability || []);
   const [showDateModal, setShowDateModal] = useState(false);
   const [newDate, setNewDate] = useState('');
   const [errorModal, setErrorModal] = useState({ show: false, message: '' });
+
+  // useEffect(() => {
+  //   if (initialAvailability?.length > 0 && selectedDates.length === 0) {
+  //     setSelectedDates(initialAvailability);
+  //   }
+  // }, [initialAvailability]);
 
   const handleAddDate = () => {
     if (!newDate) return;
@@ -27,71 +42,78 @@ const DateTimeSelector = ({ setFieldValue }: any) => {
   };
 
   const handleRemoveDate = (dateToRemove: string) => {
-    setSelectedDates(selectedDates.filter((d) => d.date !== dateToRemove));
+    setSelectedDates((prev) =>
+      prev.map((d) =>
+        d.date === dateToRemove
+          ? {
+            ...d,
+            timeSlots: d.timeSlots.map((slot) => ({ ...slot, isDeleted: true })),
+          }
+          : d
+      )
+    );
   };
 
- const handleAddTimeSlot = (date: string) => {
-  setSelectedDates((prev) =>
-    prev.map((d) => {
-      if (d.date === date) {
-        const lastSlot = d.timeSlots[d.timeSlots.length - 1];
 
-        let newStart: Date;
-        let newEnd: Date;
+  const handleAddTimeSlot = (date: string) => {
+    setSelectedDates((prev) =>
+      prev.map((d) => {
+        if (d.date === date) {
+          const lastSlot = d.timeSlots[d.timeSlots.length - 1];
 
-        if (lastSlot) {
-          // Calculate the next time slot based on the last slot
-          const lastEndTime = new Date(`1970-01-01T${lastSlot.end}:00`);
-          newStart = new Date(lastEndTime.getTime());
-          newEnd = new Date(newStart.getTime() + 15 * 60 * 1000); // Add 15 minutes
-        } else {
-          // Default to 09:00 - 09:15 if no slots exist
-          newStart = new Date(`1970-01-01T09:00:00`);
-          newEnd = new Date(newStart.getTime() + 15 * 60 * 1000);
-        }
+          let newStart: Date;
+          let newEnd: Date;
 
-        const formattedStart = newStart.toTimeString().slice(0, 5);
-        const formattedEnd = newEnd.toTimeString().slice(0, 5);
+          if (lastSlot) {
+            const lastEndTime = new Date(`1970-01-01T${lastSlot.end}:00`);
+            newStart = new Date(lastEndTime.getTime());
+            newEnd = new Date(newStart.getTime() + 15 * 60 * 1000);
+          } else {
+            newStart = new Date(`1970-01-01T09:00:00`);
+            newEnd = new Date(newStart.getTime() + 15 * 60 * 1000);
+          }
 
-        // Check if the new time slot overlaps with any existing ones
-        const isConflict = d.timeSlots.some((slot) => {
-          const existingStart = new Date(`1970-01-01T${slot.start}:00`);
-          const existingEnd = new Date(`1970-01-01T${slot.end}:00`);
+          const formattedStart = newStart.toTimeString().slice(0, 5);
+          const formattedEnd = newEnd.toTimeString().slice(0, 5);
 
-          return (
-            (newStart >= existingStart && newStart < existingEnd) || // New start overlaps
-            (newEnd > existingStart && newEnd <= existingEnd) || // New end overlaps
-            (newStart <= existingStart && newEnd >= existingEnd) // New slot completely overlaps
-          );
-        });
-
-        if (isConflict) {
-          setErrorModal({
-            show: true,
-            message: 'No available time slots. Please adjust existing slots.',
+          const isConflict = d.timeSlots.some((slot) => {
+            const existingStart = new Date(`1970-01-01T${slot.start}:00`);
+            return existingStart.getTime() === newStart.getTime();
           });
-          return d; // Keep the state unchanged
-        }
 
-        return {
-          ...d,
-          timeSlots: [...d.timeSlots, { start: formattedStart, end: formattedEnd }],
-        };
-      }
-      return d;
-    })
-  );
-};
+          if (isConflict) {
+            setErrorModal({
+              show: true,
+              message: 'Time slot overlaps with an existing slot.',
+            });
+            return d;
+          }
+
+          return {
+            ...d,
+            timeSlots: [...d.timeSlots, { start: formattedStart, end: formattedEnd }],
+          };
+        }
+        return d;
+      })
+    );
+  };
 
   const handleRemoveTimeSlot = (date: string, index: number) => {
     setSelectedDates((prev) =>
       prev.map((d) =>
         d.date === date
-          ? { ...d, timeSlots: d.timeSlots.filter((_, i) => i !== index) }
+          ? {
+            ...d,
+            timeSlots: d.timeSlots.map((slot, i) =>
+              i === index ? { ...slot, isDeleted: true } : slot
+            ),
+          }
           : d
       )
     );
   };
+
 
   const handleTimeChange = (date: string, index: number, field: 'start' | 'end', value: string) => {
     setSelectedDates((prev) =>
@@ -99,63 +121,54 @@ const DateTimeSelector = ({ setFieldValue }: any) => {
         if (d.date === date) {
           const updatedTimeSlots = d.timeSlots.map((slot, i) => {
             if (i === index) {
-              const updatedSlot = { ...slot, [field]: value };
-  
+              const updatedSlot = {
+                ...slot,
+                [field]: value,
+                isUpdated: true
+              };
+
+              // Logic to ensure the updated time is valid
               let start = new Date(`1970-01-01T${updatedSlot.start}:00`);
               let end = new Date(`1970-01-01T${updatedSlot.end}:00`);
-  
+
               if (field === 'start') {
-                // Add 15 minutes to the start time
-                const [hours, minutes] = updatedSlot.start.split(':').map(Number); // Extract hours and minutes from start time
-                const startInMinutes = hours * 60 + minutes; // Convert start time to total minutes
-                const endInMinutes = startInMinutes + 15; // Add 15 minutes
-              
-                // Convert end time back to "HH:mm" format
+                const [hours, minutes] = updatedSlot.start.split(':').map(Number);
+                const startInMinutes = hours * 60 + minutes;
+                const endInMinutes = startInMinutes + 15;
+
                 const endHours = Math.floor(endInMinutes / 60);
                 const endMinutes = endInMinutes % 60;
                 updatedSlot.end = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
               }
-              
-              // Validate Time Slot Duration
-            //   if (field === 'end' && end.getTime() - start.getTime() > 15 * 60 * 1000) {
-            //     setErrorModal({
-            //       show: true,
-            //       message: 'Time slot cannot exceed 15 minutes.',
-            //     });
-            //     return slot; // Revert to previous value
-            //   }
-  
-              // Validate Overlap with Other Time Slots
+
               const isConflict = d.timeSlots.some((existingSlot, idx) => {
                 if (idx !== index) {
                   const existingStart = new Date(`1970-01-01T${existingSlot.start}:00`);
-                  // Compare the time values
                   return existingStart.getTime() === start.getTime();
                 }
                 return false;
               });
-  
-  
+
               if (isConflict) {
                 setErrorModal({
                   show: true,
-                  message: 'Time slot overlaps with an existing slot. Please choose another time.',
+                  message: 'Time slot overlaps with an existing slot.',
                 });
-                return slot; // Revert to previous value
+                return slot;
               }
-  
+
               return updatedSlot;
             }
             return slot;
           });
-  
+
           return { ...d, timeSlots: updatedTimeSlots };
         }
         return d;
       })
     );
   };
-  
+
 
   const closeErrorModal = () => {
     setErrorModal({ show: false, message: '' });
@@ -164,7 +177,7 @@ const DateTimeSelector = ({ setFieldValue }: any) => {
   useEffect(() => {
     setFieldValue('availability', selectedDates)
   }, [selectedDates])
-  
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -182,79 +195,86 @@ const DateTimeSelector = ({ setFieldValue }: any) => {
 
       {/* Selected Dates and Time Slots */}
       <div className="space-y-6">
-        {selectedDates.map((dateObj) => (
-          <div
-            key={dateObj.date}
-            className="bg-gray-800/50 rounded-xl p-6 border border-gray-700"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary-400" />
-                <span className="text-white font-medium">
-                  {format(new Date(dateObj.date), 'MMMM d, yyyy')}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveDate(dateObj.date)}
-                className="p-1 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {dateObj.timeSlots.map((slot, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <div className="flex-1 grid grid-cols-2 gap-4">
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                      </div>
-                      <input
-                        type="time"
-                        value={slot.start}
-                        onChange={(e) =>
-                          handleTimeChange(dateObj.date, index, 'start', e.target.value)
-                        }
-                        className="w-full pl-10 px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
-                      />
-                    </div>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                      </div>
-                      <input
-                        type="time"
-                        value={slot.end}
-                        disabled
-                        onChange={(e) =>
-                          handleTimeChange(dateObj.date, index, 'end', e.target.value)
-                        }
-                        className="w-full pl-10 px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTimeSlot(dateObj.date, index)}
-                    className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4 text-gray-400" />
-                  </button>
+        {selectedDates
+          .filter(
+            (dateObj) =>
+              dateObj.timeSlots?.length === 0 || // Allow if timeSlots is empty
+              dateObj.timeSlots.some((slot) => !slot.isDeleted) // Check for undeleted slots
+          )
+          .map((dateObj) => (
+            <div
+              key={dateObj.date}
+              className="bg-gray-800/50 rounded-xl p-6 border border-gray-700"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5 text-primary-400" />
+                  <span className="text-white font-medium">
+                    {format(new Date(dateObj.date), 'MMMM d, yyyy')}
+                  </span>
                 </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => handleAddTimeSlot(dateObj.date)}
-                className="w-full px-4 py-2 border-2 border-dashed border-gray-600 hover:border-primary-500 text-gray-400 hover:text-primary-400 rounded-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Time Slot
-              </button>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveDate(dateObj.date)}
+                  className="p-1 hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {dateObj.timeSlots
+                  .filter((slot) => !slot.isDeleted).map((slot, index) => (
+                    <div key={slot.timeSlotId || index} className="flex items-center gap-4">
+                      <div className="flex-1 grid grid-cols-2 gap-4">
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <input
+                            type="time"
+                            value={slot.start}
+                            onChange={(e) =>
+                              handleTimeChange(dateObj.date, index, 'start', e.target.value)
+                            }
+                            className="w-full pl-10 px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
+                          />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <input
+                            type="time"
+                            value={slot.end}
+                            disabled
+                            onChange={(e) =>
+                              handleTimeChange(dateObj.date, index, 'end', e.target.value)
+                            }
+                            className="w-full pl-10 px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:border-primary-500"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTimeSlot(dateObj.date, index)}
+                        className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <X className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
+                  ))}
+                <button
+                  type="button"
+                  onClick={() => handleAddTimeSlot(dateObj.date)}
+                  className="w-full px-4 py-2 border-2 border-dashed border-gray-600 hover:border-primary-500 text-gray-400 hover:text-primary-400 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Time Slot
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Error Modal */}

@@ -36,6 +36,35 @@ const validationSchema = Yup.object().shape({
   responseTime: Yup.string().required('Response time is required'),
 });
 
+const transformAvailabilityData = (availability: any[]) => {
+  // Group by date
+  const groupedByDate = availability.reduce((acc: any, curr: any) => {
+    // Parse the date in UTC to avoid local timezone conversion
+    const date = new Date(curr.date).toISOString().split('T')[0];
+  
+    if (!acc[date]) {
+      acc[date] = {
+        date,
+        timeSlots: [],
+      };
+    }
+  
+    // Format time slots without altering the original UTC time
+    const timeSlot = {
+      timeSlotId: curr.timeSlots[0].timeSlotId,
+      start: curr.timeSlots[0].start.slice(11, 16), // Extract "HH:mm" directly from the API
+      end: curr.timeSlots[0].end.slice(11, 16), // Extract "HH:mm" directly from the API
+    };
+  
+    acc[date].timeSlots.push(timeSlot);
+    return acc;
+  }, {});
+  
+
+  // Convert the grouped object back to array
+  return Object.values(groupedByDate);
+};
+
 const EditPricing = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -55,9 +84,8 @@ const EditPricing = () => {
       ? Math.round(user.celebrity.meetingPrice) 
       : '',
     responseTime: user?.celebrity?.responseTime || 'TwentyFourHours',
-    availability: user?.celebrity?.availability || []
+    availability: user?.celebrity?.availability ? transformAvailabilityData(user.celebrity.availability) : []
   };
-  
 
   const responseTimes = ['TwentyFourHours', 'FortyEightHours', 'ThreeDays', 'OneWeek'];
 
@@ -215,7 +243,7 @@ const EditPricing = () => {
                   {/* Response Time */}
                   <div>
                     <h2 className="text-xl font-semibold mb-4">Response Time</h2>
-                    <div className="max-w-md">
+                    <div className="max-w-xxl">
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <Clock className="h-5 w-5 text-gray-400" />
@@ -247,6 +275,7 @@ const EditPricing = () => {
                         setFieldValue={(field: string, value: any) => {
                           setFieldValue(field, value);
                         }}
+                        initialAvailability={values.availability}
                       />
                     </div>
                   )}

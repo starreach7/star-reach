@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -38,8 +37,15 @@ function App() {
               <CelebrityProfile />
             </PrivateRoute>
           } />
-          <Route path="/profile/edit" element={<EditProfile />} />
-          <Route path="/profile/pricing" element={<EditPricing />} />
+          <Route path="/profile/edit" element={
+            <PrivateRoute>
+              <EditProfile />
+            </PrivateRoute>
+          } />
+          <Route path="/profile/pricing" element={
+            <PrivateRoute>
+              <EditPricing />
+            </PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/settings" element={
