@@ -33,6 +33,7 @@ const Explore = () => {
 
   const handlePriceRangeChange = (range: { min: string; max: string }) => {
     setSelectedPriceRange(range);
+    setCurrentPage(0); // Reset to first page
   };
 
   const handleRatingChange = (rating: number) => {
@@ -41,15 +42,17 @@ const Explore = () => {
         ? prev.filter(r => r !== rating)
         : [...prev, rating]
     );
+    setCurrentPage(0); // Reset to first page
   };
 
   const handleSortChange = (sort: string) => {
     setSelectedSort(sort === selectedSort ? '' : sort);
+    setCurrentPage(0); // Reset to first page
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(0); // Reset to first page when searching
+    setCurrentPage(0); // Reset to first page
   };
 
   if (error) {

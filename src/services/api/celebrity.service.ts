@@ -10,6 +10,7 @@ interface GetCelebritiesParams {
   maxPrice?: string;
   ratings?: number[];
   sortBy?: string;
+  categoryId?: string; // Add categoryId as optional parameter
 }
 
 
@@ -119,6 +120,11 @@ class CelebrityService {
       if (params.sortBy) {
         queryParams.append('sortBy', params.sortBy);
       }
+
+        // Add categoryId to query params if provided
+        if (params.categoryId) {
+          queryParams.append('categoryId', params.categoryId);
+        }
 
       const response = await api.get(`/user/celebrities?${queryParams.toString()}`);
       return response.data;
