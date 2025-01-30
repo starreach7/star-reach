@@ -76,7 +76,7 @@ const Categories = () => {
                       <span className="text-sm text-gray-500">
                         {category.celebrityCount} celebrities
                       </span>
-                      <Link to={`${category.id}`} className="text-emerald-400 hover:text-emerald-300 font-medium" >
+                      <Link to={`${category.name}`} className="text-emerald-400 hover:text-emerald-300 font-medium" >
                         Browse All →
                       </Link>
                     </div>

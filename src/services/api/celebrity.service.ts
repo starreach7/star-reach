@@ -123,7 +123,7 @@ class CelebrityService {
 
         // Add categoryId to query params if provided
         if (params.categoryId) {
-          queryParams.append('categoryId', params.categoryId);
+          queryParams.append('category', params.categoryId);
         }
 
       const response = await api.get(`/user/celebrities?${queryParams.toString()}`);

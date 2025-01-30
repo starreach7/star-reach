@@ -15,19 +15,19 @@ interface BookingFormProps {
 
 // Mock available time slots - In production, these would come from an API
 const availableSlots = {
-  '2024-12-20': {
+  '2025-02-20': {
     morning: ['9:00 AM', '10:00 AM', '11:00 AM'],
     afternoon: ['2:00 PM', '3:00 PM', '4:00 PM']
   },
-  '2024-12-21': {
+  '2025-02-21': {
     morning: ['9:00 AM', '10:00 AM', '11:00 AM'],
     afternoon: ['1:00 PM', '2:00 PM']
   },
-  '2024-12-22': {
+  '2025-02-22': {
     morning: ['10:00 AM', '11:00 AM'],
     afternoon: ['2:00 PM', '3:00 PM', '4:00 PM']
   },
-  '2024-12-23': {
+  '2025-02-23': {
     morning: ['9:00 AM', '10:00 AM'],
     afternoon: ['1:00 PM', '2:00 PM', '3:00 PM']
   }
