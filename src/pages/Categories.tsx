@@ -3,14 +3,14 @@ import { Clapperboard, Music, Trophy, TrendingUp, Laugh, Tv } from 'lucide-react
 import { Link } from 'react-router-dom';
 import { useCategories } from '../store/categoryStore';
 
-const iconMap: { [key: string]: any } = {
-  clapperboard: Clapperboard,
-  music: Music,
-  trophy: Trophy,
-  'trending-up': TrendingUp,
-  laugh: Laugh,
-  tv: Tv,
-};
+// const iconMap: { [key: string]: any } = {
+//   clapperboard: Clapperboard,
+//   music: Music,
+//   trophy: Trophy,
+//   'trending-up': TrendingUp,
+//   laugh: Laugh,
+//   tv: Tv,
+// };
 
 const Categories = () => {
   const { categories, loading, error, fetchCategories } = useCategories();

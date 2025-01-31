@@ -18,7 +18,20 @@ const reviews = [
   }
 ];
 
-const ReviewSection = () => {
+interface Review {
+  id: string;
+  username: string;
+  profileImage: string;
+  rating: number;
+  review: string;
+  createdAt: string;
+}
+
+interface ReviewSectionProps {
+  reviews: Review[];
+}
+
+const ReviewSection: React.FC<ReviewSectionProps> = ({ reviews = [] }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -29,21 +42,23 @@ const ReviewSection = () => {
       </div>
       
       <div className="grid gap-6">
-        {reviews.map((review, index) => (
+        {reviews.map((review) => (
           <div 
-            key={index} 
+            key={review.id} 
             className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 backdrop-blur-sm hover:border-gray-600 transition-colors"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center">
                 <img
-                  src={review.image}
-                  alt={review.user}
+                  src={review.profileImage}
+                  alt={review.username}
                   className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500"
                 />
                 <div className="ml-3">
-                  <h3 className="text-white font-medium">{review.user}</h3>
-                  <p className="text-gray-400 text-sm">{review.date}</p>
+                  <h3 className="text-white font-medium">{review.username}</h3>
+                  <p className="text-gray-400 text-sm">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
               <div className="flex text-yellow-400">
@@ -52,7 +67,7 @@ const ReviewSection = () => {
                 ))}
               </div>
             </div>
-            <p className="text-gray-300 leading-relaxed">{review.comment}</p>
+            <p className="text-gray-300 leading-relaxed">{review.review}</p>
           </div>
         ))}
       </div>
