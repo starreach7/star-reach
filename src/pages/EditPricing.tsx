@@ -67,6 +67,10 @@ const transformAvailabilityData = (availability: any[]) => {
 
 const EditPricing = () => {
   const { user } = useAuth();
+
+
+  console.log(user);
+  
   const [loading, setLoading] = useState(false);
   const [showAvailability, setShowAvailability] = useState(
     user?.celebrity?.services?.includes('meetingPrice') || false
@@ -276,6 +280,7 @@ const EditPricing = () => {
                           setFieldValue(field, value);
                         }}
                         initialAvailability={values.availability}
+                        editMode={true} 
                       />
                     </div>
                   )}

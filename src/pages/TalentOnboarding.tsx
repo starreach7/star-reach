@@ -8,6 +8,7 @@ import PricingForm from '../components/onboarding/PricingForm';
 import OnboardingProgress from '../components/onboarding/OnboardingProgress';
 import { useCelebrityOnboarding } from '../hooks/useCelebrityOnboarding';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../store/authStore';
 
 
 const steps = [
@@ -167,6 +168,8 @@ const TalentOnboarding = () => {
     }
   };
 
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,8 +187,8 @@ const TalentOnboarding = () => {
         <div className="bg-gray-800 rounded-xl p-6 md:p-8 shadow-xl">
           <Formik
             initialValues={{
-              fullName: '',
-              email: '',
+              fullName: user?.firstName + ' ' + user?.lastName || '',
+              email: user?.email || '',
               phone: '',
               location: '',
               website: '',

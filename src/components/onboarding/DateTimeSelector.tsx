@@ -16,9 +16,10 @@ interface DateAvailability {
 interface DateTimeSelectorProps {
   setFieldValue: (field: string, value: any) => void;
   initialAvailability?: DateAvailability[];
+  editMode?: boolean; // Add this line
 }
 
-const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, initialAvailability }) => {
+const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, initialAvailability,editMode = false }) => {
 
   console.log(initialAvailability, 'initialAvailability');
 
@@ -124,7 +125,7 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, init
               const updatedSlot = {
                 ...slot,
                 [field]: value,
-                isUpdated: true
+                ...(editMode && { isUpdated: true }) // Add isUpdated only in edit mode
               };
 
               // Logic to ensure the updated time is valid

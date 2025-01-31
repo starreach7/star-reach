@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Mail, Phone, MapPin, Globe, Camera } from 'lucide-react';
+import { User, Mail,  MapPin, Globe, Camera } from 'lucide-react';
 import { Form, Field, FormikProps } from 'formik';
 
 interface BasicInfoFormProps {
@@ -67,6 +67,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formik, onNext }) => {
               name="fullName"
               className="block w-full pl-10 pr-3 py-2.5 border border-gray-600 rounded-lg bg-gray-700/50 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               placeholder="Your full name"
+              disabled
             />
           </div>
           {formik.touched.fullName && formik.errors.fullName && (
@@ -87,6 +88,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formik, onNext }) => {
               name="email"
               className="block w-full pl-10 pr-3 py-2.5 border border-gray-600 rounded-lg bg-gray-700/50 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               placeholder="your@email.com"
+              disabled
             />
           </div>
           {formik.touched.email && formik.errors.email && (

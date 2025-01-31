@@ -1,5 +1,5 @@
 import api from './axios';
-import AuthService from './auth.service'; // Import AuthService
+import AuthService from './auth.service';
 import { CelebrityOnboardingData } from '../../types/celebrity';
 import { useAuth } from '../../store/authStore';
 
@@ -10,9 +10,8 @@ interface GetCelebritiesParams {
   maxPrice?: string;
   ratings?: number[];
   sortBy?: string;
-  categoryId?: string; // Add categoryId as optional parameter
+  categoryId?: string;
 }
-
 
 class CelebrityService {
   async onboard(data: CelebrityOnboardingData): Promise<void> {
@@ -127,6 +126,15 @@ class CelebrityService {
         }
 
       const response = await api.get(`/user/celebrities?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  async getCelebrityProfile(id: string) {
+    try {
+      const response = await api.get(`/user/celebrity/${id}`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);

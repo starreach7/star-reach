@@ -126,19 +126,13 @@ const Explore = () => {
                     <CelebrityCard
                       key={celebrity.celebrityId}
                       celebrity={{
-                        id: parseInt(celebrity.celebrityId),
-                        name: celebrity.fullName,
-                        image: celebrity.profileImage,
-                        category: celebrity.categoryName,
-                        price: parseFloat(celebrity.price),
-                        rating: celebrity.averageRating,
-                        reviews: 0,
-                        bookings: 0,
-                        stats: {
-                          completed: '0',
-                          avgResponse: 'N/A',
-                          joinedDate: 'Recently'
-                        }
+                        fullName: celebrity.fullName,
+                        profileImage: celebrity.profileImage,
+                        categoryName: celebrity.categoryName,
+                        price: celebrity.price,
+                        averageRating: celebrity.averageRating,
+                        celebrityId: celebrity.celebrityId,
+                        userId: celebrity.userId,
                       }}
                     />
                   ))}
