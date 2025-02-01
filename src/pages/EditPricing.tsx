@@ -129,6 +129,77 @@ const EditPricing = () => {
     }
   };
 
+  // Add this before your main return statement
+if (!user?.celebrity) {
+  return (
+    <div className="min-h-screen bg-gray-900 py-12">
+      {/* Header Skeleton */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-gray-900/95 border-b border-gray-800 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="h-6 w-24 bg-gray-800 rounded animate-pulse" />
+            <div className="h-6 w-48 bg-gray-800 rounded animate-pulse" />
+            <div className="w-12" />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Skeleton */}
+      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-800/50 rounded-xl p-6 sm:p-8 border border-gray-700 space-y-8">
+            {/* Services Skeleton */}
+            <div className="space-y-6">
+              <div className="h-7 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="grid gap-6 md:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-56 bg-gray-700 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            </div>
+
+            {/* Pricing Inputs Skeleton */}
+            <div className="space-y-6">
+              <div className="h-7 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="grid gap-6 md:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-5 w-32 bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 bg-gray-700 rounded-lg animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Response Time Skeleton */}
+            <div className="space-y-6">
+              <div className="h-7 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="h-12 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Availability Skeleton */}
+            <div className="space-y-6">
+              <div className="h-7 w-48 bg-gray-700 rounded animate-pulse" />
+              <div className="grid grid-cols-7 gap-2">
+                {[...Array(7)].map((_, i) => (
+                  <div key={i} className="h-24 bg-gray-700 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            </div>
+
+            {/* Info Box Skeleton */}
+            <div className="h-24 bg-gray-700 rounded-lg animate-pulse" />
+
+            {/* Submit Button Skeleton */}
+            <div className="flex justify-end">
+              <div className="h-12 w-32 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Header */}

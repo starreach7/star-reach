@@ -66,29 +66,84 @@ const EditProfile = () => {
 
   const responseTimes = ['TwentyFourHours', 'FortyEightHours', 'ThreeDays', 'OneWeek'];
 
-  if (categoriesLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 py-12">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="h-8 w-48 bg-gray-800 rounded animate-pulse"></div>
+if (categoriesLoading || !user?.celebrity) {
+  return (
+    <div className="min-h-screen bg-gray-900 py-12">
+      {/* Mobile-friendly header skeleton */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-gray-900/95 border-b border-gray-800 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="h-6 w-24 bg-gray-800 rounded animate-pulse" />
+            <div className="h-6 w-48 bg-gray-800 rounded animate-pulse" />
+            <div className="w-12" />
+          </div>
         </div>
       </div>
-    );
-  }
 
-  if (categoriesError) {
-    return (
-      <div className="min-h-screen bg-gray-900 py-12">
-        <div className="max-w-3xl mx-auto px-4">
-          <p className="text-red-500">Failed to load categories</p>
+      {/* Main content skeleton */}
+      <div className="pt-16 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-800/50 rounded-xl sm:rounded-2xl p-4 sm:p-8 border border-gray-700 space-y-8">
+            {/* Promotional Video Skeleton */}
+            <div className="space-y-4">
+              <div className="h-5 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="h-48 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Category Skeleton */}
+            <div className="space-y-4">
+              <div className="h-5 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="h-12 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Bio Skeleton */}
+            <div className="space-y-4">
+              <div className="h-5 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="h-32 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Tags Skeleton */}
+            <div className="space-y-4">
+              <div className="h-5 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="flex gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-8 w-20 bg-gray-700 rounded-full animate-pulse" />
+                ))}
+              </div>
+              <div className="h-12 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Response Time Skeleton */}
+            <div className="space-y-4">
+              <div className="h-5 w-40 bg-gray-700 rounded animate-pulse" />
+              <div className="h-12 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+
+            {/* Submit Button Skeleton */}
+            <div className="pt-6">
+              <div className="h-12 w-full sm:w-48 bg-gray-700 rounded-lg animate-pulse" />
+            </div>
+          </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+if (categoriesError) {
+  return (
+    <div className="min-h-screen bg-gray-900 py-12">
+      <div className="max-w-3xl mx-auto px-4">
+        <p className="text-red-500">Failed to load categories</p>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Mobile-friendly header */}
+      
       <div className="fixed top-0 left-0 right-0 z-10 bg-gray-900/95 border-b border-gray-800 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
