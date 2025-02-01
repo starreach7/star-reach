@@ -1,22 +1,5 @@
 import React from 'react';
-import { Star } from 'lucide-react';
-
-const reviews = [
-  {
-    user: 'John D.',
-    rating: 5,
-    date: '2 days ago',
-    comment: 'Amazing experience! Emma was so genuine and delivered exactly what I wanted. The video made my sister\'s birthday truly special.',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e'
-  },
-  {
-    user: 'Sarah M.',
-    rating: 5,
-    date: '1 week ago',
-    comment: 'Exceeded all expectations! The turnaround time was incredibly fast, and the video quality was outstanding.',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80'
-  }
-];
+import { Star,MessageCircle  } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -32,6 +15,18 @@ interface ReviewSectionProps {
 }
 
 const ReviewSection: React.FC<ReviewSectionProps> = ({ reviews = [] }) => {
+  if (reviews.length === 0) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-white">Reviews</h2>
+        <div className="bg-gray-800/50 rounded-xl p-8 text-center border border-dashed border-gray-600">
+          <MessageCircle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-300 mb-2">No Reviews Yet</h3>
+          <p className="text-gray-400">Be the first to leave a review for this celebrity!</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

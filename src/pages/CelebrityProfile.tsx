@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Star, Clock, Globe, Tag, MessageCircle, Video, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { Star, Clock, Tag, MessageCircle, Video , X} from 'lucide-react';
 import BookingForm from '../components/BookingForm';
 import ReelsSection from '../components/ReelsSection';
 import ReviewSection from '../components/ReviewSection';
@@ -12,6 +12,8 @@ import { useAuth } from '../store/authStore';
 
 const CelebrityProfile = () => {
   const { id } = useParams();
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  
   const [bookingType, setBookingType] = useState<'personal' | 'business' | 'meeting'>('personal');
   const { user } = useAuth();
 
@@ -25,108 +27,110 @@ const CelebrityProfile = () => {
 
   // In CelebrityProfile.tsx, replace the loading return statement with:
 
-if (isLoading) {
-  return (
-    <div className="min-h-screen bg-gray-900 pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
-          {/* Profile Image Skeleton */}
-          <div className="lg:col-span-3 flex justify-center lg:justify-start">
-            <div className="relative w-48 h-48 lg:w-56 lg:h-56">
-              <div className="w-full h-full rounded-full bg-gray-800 animate-pulse"></div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-800 animate-pulse rounded-full"></div>
-            </div>
-          </div>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 pt-20 pb-12">
+        {/* Video Modal */}
 
-          {/* Profile Info Skeleton */}
-          <div className="lg:col-span-9 text-center lg:text-left">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-              <div className="h-10 w-64 bg-gray-800 animate-pulse rounded-lg mb-4"></div>
-              <div className="h-10 w-48 bg-gray-800 animate-pulse rounded-lg"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Hero Section Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+            {/* Profile Image Skeleton */}
+            <div className="lg:col-span-3 flex justify-center lg:justify-start">
+              <div className="relative w-48 h-48 lg:w-56 lg:h-56">
+                <div className="w-full h-full rounded-full bg-gray-800 animate-pulse"></div>
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-800 animate-pulse rounded-full"></div>
+              </div>
             </div>
-            <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
-              <div className="h-6 w-32 bg-gray-800 animate-pulse rounded-lg"></div>
-            </div>
-            <div className="h-20 w-full max-w-2xl bg-gray-800 animate-pulse rounded-lg mb-6"></div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6 max-w-2xl">
-              <div className="h-10 bg-gray-800 animate-pulse rounded-lg"></div>
-              <div className="h-10 bg-gray-800 animate-pulse rounded-lg"></div>
-            </div>
-            <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-8 w-24 bg-gray-800 animate-pulse rounded-full"></div>
-              ))}
-            </div>
-          </div>
-        </div>
 
-        {/* Main Content Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Booking Section Skeleton */}
-            <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
-              <div className="grid grid-cols-3 gap-3 mb-6">
+            {/* Profile Info Skeleton */}
+            <div className="lg:col-span-9 text-center lg:text-left">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+                <div className="h-10 w-64 bg-gray-800 animate-pulse rounded-lg mb-4"></div>
+                <div className="h-10 w-48 bg-gray-800 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                <div className="h-6 w-32 bg-gray-800 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="h-20 w-full max-w-2xl bg-gray-800 animate-pulse rounded-lg mb-6"></div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6 max-w-2xl">
+                <div className="h-10 bg-gray-800 animate-pulse rounded-lg"></div>
+                <div className="h-10 bg-gray-800 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-12 bg-gray-700 rounded-lg"></div>
-                ))}
-              </div>
-              <div className="space-y-4">
-                <div className="h-40 bg-gray-700 rounded-lg"></div>
-                <div className="h-12 bg-gray-700 rounded-lg"></div>
-              </div>
-            </div>
-
-            {/* Videos Section Skeleton */}
-            <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
-              <div className="h-8 w-48 bg-gray-700 rounded-lg mb-6"></div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-[9/16] bg-gray-700 rounded-lg"></div>
+                  <div key={i} className="h-8 w-24 bg-gray-800 animate-pulse rounded-full"></div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Reviews Section Skeleton */}
-            <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
-              <div className="h-8 w-48 bg-gray-700 rounded-lg mb-6"></div>
-              <div className="space-y-4">
-                {[1, 2].map((i) => (
-                  <div key={i} className="p-4 bg-gray-700 rounded-lg">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-gray-600 rounded-full"></div>
-                      <div className="ml-4 space-y-2">
-                        <div className="h-4 w-32 bg-gray-600 rounded"></div>
-                        <div className="h-4 w-24 bg-gray-600 rounded"></div>
+          {/* Main Content Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Booking Section Skeleton */}
+              <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-12 bg-gray-700 rounded-lg"></div>
+                  ))}
+                </div>
+                <div className="space-y-4">
+                  <div className="h-40 bg-gray-700 rounded-lg"></div>
+                  <div className="h-12 bg-gray-700 rounded-lg"></div>
+                </div>
+              </div>
+
+              {/* Videos Section Skeleton */}
+              <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
+                <div className="h-8 w-48 bg-gray-700 rounded-lg mb-6"></div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-[9/16] bg-gray-700 rounded-lg"></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Reviews Section Skeleton */}
+              <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
+                <div className="h-8 w-48 bg-gray-700 rounded-lg mb-6"></div>
+                <div className="space-y-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="p-4 bg-gray-700 rounded-lg">
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 bg-gray-600 rounded-full"></div>
+                        <div className="ml-4 space-y-2">
+                          <div className="h-4 w-32 bg-gray-600 rounded"></div>
+                          <div className="h-4 w-24 bg-gray-600 rounded"></div>
+                        </div>
                       </div>
+                      <div className="h-16 bg-gray-600 rounded"></div>
                     </div>
-                    <div className="h-16 bg-gray-600 rounded"></div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
-              <div className="h-8 w-32 bg-gray-700 rounded-lg mb-6"></div>
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="p-4 bg-gray-700 rounded-lg">
-                    <div className="h-6 w-24 bg-gray-600 rounded mb-2"></div>
-                    <div className="h-8 w-32 bg-gray-600 rounded"></div>
-                  </div>
-                ))}
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
+                <div className="h-8 w-32 bg-gray-700 rounded-lg mb-6"></div>
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-4 bg-gray-700 rounded-lg">
+                      <div className="h-6 w-24 bg-gray-600 rounded mb-2"></div>
+                      <div className="h-8 w-32 bg-gray-600 rounded"></div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
 
   if (error || !celebrity) {
@@ -145,19 +149,37 @@ if (isLoading) {
 
   return (
     <div className="min-h-screen bg-gray-900 pt-20 pb-12">
+            {showVideoModal && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl">
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute -top-8 right-0 text-white hover:text-emerald-400 transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <video 
+              controls
+              autoPlay
+              className="w-full aspect-video rounded-lg"
+              src={celebrity.promotionalVideo}
+            />
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
           {/* Profile Image */}
           <div className="lg:col-span-3 flex justify-center lg:justify-start">
-            <div className="relative w-48 h-48 lg:w-56 lg:h-56">
+            <div className="relative w-48 h-48 lg:w-56 lg:h-56 cursor-pointer" onClick={() => setShowVideoModal(true)}>
               <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30 animate-pulse"></div>
               <img
                 src={celebrity.profileImage}
                 alt={celebrity.fullName}
                 className="w-full h-full rounded-full object-cover border-2 border-emerald-500 shadow-lg shadow-emerald-500/20"
               />
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-0.5 rounded-full text-sm font-medium">
+              <div  className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-0.5 rounded-full text-sm font-medium cursor-pointer hover:bg-emerald-600 transition-colors"  onClick={() => setShowVideoModal(true)}>
                 {celebrity.categoryName}
               </div>
             </div>
@@ -174,9 +196,17 @@ if (isLoading) {
               )}
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3 text-emerald-400 mb-4">
-              <div className="flex items-center text-yellow-400">
-                <Star className="h-5 w-5 fill-current" />
-                <span className="ml-1 font-bold">{celebrity.averageRating}</span>
+              <div className="flex items-center gap-1">
+                <div className="flex items-center text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-5 w-5 ${i < Math.round(celebrity.averageRating) ? 'fill-current' : 'fill-transparent stroke-yellow-400'}`}
+                      strokeWidth={1.5}
+                    />
+                  ))}
+                </div>
+                <span className="ml-1 font-bold text-yellow-400">{celebrity.averageRating}</span>
                 <span className="ml-1 text-gray-300">({celebrity.reviews?.length || 0} reviews)</span>
               </div>
             </div>
@@ -216,33 +246,30 @@ if (isLoading) {
               <div className="grid grid-cols-3 gap-3 mb-6">
                 <button
                   onClick={() => setBookingType('personal')}
-                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                    bookingType === 'personal'
+                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${bookingType === 'personal'
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>Personal</span>
                 </button>
                 <button
                   onClick={() => setBookingType('business')}
-                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                    bookingType === 'business'
+                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${bookingType === 'business'
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   <Tag className="w-4 h-4" />
                   <span>Business</span>
                 </button>
                 <button
                   onClick={() => setBookingType('meeting')}
-                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                    bookingType === 'meeting'
+                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${bookingType === 'meeting'
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   <Video className="w-4 h-4" />
                   <span>Meeting</span>
@@ -268,11 +295,11 @@ if (isLoading) {
 
           {/* Right Column */}
           <div className="space-y-6">
-            <StatsCard 
+            <StatsCard
               stats={{
                 completed: celebrity.reviews?.length.toString() || '0',
                 avgResponse: celebrity.responseTime,
-                joinedDate: new Date(celebrity.createdAt).toLocaleDateString('en-US', { 
+                joinedDate: new Date(celebrity.createdAt).toLocaleDateString('en-US', {
                   month: 'long',
                   year: 'numeric'
                 })

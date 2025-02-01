@@ -122,26 +122,29 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, init
         if (d.date === date) {
           const updatedTimeSlots = d.timeSlots.map((slot, i) => {
             if (i === index) {
+              // Only add isUpdated if the slot has an ID
+              const shouldUpdate = !!slot.timeSlotId;
+              
               const updatedSlot = {
                 ...slot,
                 [field]: value,
-                ...(editMode && { isUpdated: true }) // Add isUpdated only in edit mode
+                ...(shouldUpdate && { isUpdated: true })
               };
-
-              // Logic to ensure the updated time is valid
+  
+              // Rest of your existing time validation logic
               let start = new Date(`1970-01-01T${updatedSlot.start}:00`);
               let end = new Date(`1970-01-01T${updatedSlot.end}:00`);
-
+  
               if (field === 'start') {
                 const [hours, minutes] = updatedSlot.start.split(':').map(Number);
                 const startInMinutes = hours * 60 + minutes;
                 const endInMinutes = startInMinutes + 15;
-
+  
                 const endHours = Math.floor(endInMinutes / 60);
                 const endMinutes = endInMinutes % 60;
                 updatedSlot.end = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
               }
-
+  
               const isConflict = d.timeSlots.some((existingSlot, idx) => {
                 if (idx !== index) {
                   const existingStart = new Date(`1970-01-01T${existingSlot.start}:00`);
@@ -149,7 +152,7 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, init
                 }
                 return false;
               });
-
+  
               if (isConflict) {
                 setErrorModal({
                   show: true,
@@ -157,12 +160,12 @@ const DateTimeSelector: React.FC<DateTimeSelectorProps> = ({ setFieldValue, init
                 });
                 return slot;
               }
-
+  
               return updatedSlot;
             }
             return slot;
           });
-
+  
           return { ...d, timeSlots: updatedTimeSlots };
         }
         return d;
