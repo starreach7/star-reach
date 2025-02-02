@@ -36,41 +36,35 @@ const CelebrityProfile = () => {
 
   const transformMeetingSchedules = (schedules: string[]): AvailableSlots => {
     const slots: AvailableSlots = {};
-    
+  
     schedules.forEach(schedule => {
       const date = new Date(schedule);
-      
-      // Format the date key (YYYY-MM-DD)
+  
       const dateKey = date.toISOString().split('T')[0];
-      
-      // Format time (HH:MM AM/PM)
+  
+      // Format time in UTC
       const timeString = date.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
-        hour12: true
+        hour12: true,
+        timeZone: 'UTC' // Add this to get UTC time
       }).toUpperCase();
-      
-      // Initialize the date entry if it doesn't exist
+  
       if (!slots[dateKey]) {
-        slots[dateKey] = {
-          morning: [],
-          afternoon: []
-        };
+        slots[dateKey] = { morning: [], afternoon: [] };
       }
-      
-      // Determine if it's morning or afternoon
-      const hour = date.getHours();
+  
+      const hour = date.getUTCHours();
       if (hour < 12) {
         slots[dateKey].morning.push(timeString);
       } else {
         slots[dateKey].afternoon.push(timeString);
       }
-      
-      // Sort the times
+  
       slots[dateKey].morning.sort();
       slots[dateKey].afternoon.sort();
     });
-    
+  
     return slots;
   };
 

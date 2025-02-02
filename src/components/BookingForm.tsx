@@ -28,6 +28,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
   celebrity,
   availableSlots = {} // Provide default empty object
 }) => {
+
+
+  console.log(availableSlots);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -61,16 +64,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   const formatDisplayDate = (utcDate: string) => {
     const date = new Date(`${utcDate}T00:00:00Z`);
-    return `${date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('en-US', { 
       weekday: 'long',
       month: 'long',
       day: 'numeric',
-      timeZone: 'UTC'
-    })} (UTC) → ${date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric'
-    })} (Your Time)`;
+      timeZone: 'UTC' // Show UTC date only
+    });
   };
 
   const handleDateSelect = (fullDate: string) => {
@@ -112,11 +111,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
       localTime: utcDateTime.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
-        hour12: true
+        hour12: true,
+        timeZone: 'UTC' // Force UTC time formatting
       }),
       localDate: utcDateTime.toLocaleDateString('en-US', {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC' // Force UTC date formatting
       })
     };
   };
