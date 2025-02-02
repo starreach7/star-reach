@@ -9,13 +9,19 @@ interface CelebrityCardProps {
 const CelebrityCard = ({ celebrity }: CelebrityCardProps) => {
   return (
     <Link to={`/celebrity/${celebrity.celebrityId}`} className="block bg-gray-800 rounded-xl overflow-hidden">
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden group">
         <img 
           src={celebrity.profileImage} 
           alt={celebrity.fullName} 
-          className="w-full h-64 object-cover transform transition-transform duration-300 hover:scale-110"
+          className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        {/* Overlay that appears on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Shine effect */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-700">
+          <div className="absolute inset-0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        </div>
       </div>
       <div className="p-6">
         <div className="flex justify-between items-center mb-3">

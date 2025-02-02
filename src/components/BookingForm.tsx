@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Shield, Building2, Users, Video, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 
+interface TimeSlot {
+  morning: string[];
+  afternoon: string[];
+}
+
+interface AvailableSlots {
+  [key: string]: TimeSlot;
+}
+
 interface BookingFormProps {
   type: 'personal' | 'business' | 'meeting';
   celebrity: {
@@ -11,29 +20,14 @@ interface BookingFormProps {
       meeting: number;
     };
   };
+  availableSlots?: AvailableSlots;
 }
 
-// Mock available time slots - In production, these would come from an API
-const availableSlots = {
-  '2025-02-20': {
-    morning: ['9:00 AM', '10:00 AM', '11:00 AM'],
-    afternoon: ['2:00 PM', '3:00 PM', '4:00 PM']
-  },
-  '2025-02-21': {
-    morning: ['9:00 AM', '10:00 AM', '11:00 AM'],
-    afternoon: ['1:00 PM', '2:00 PM']
-  },
-  '2025-02-22': {
-    morning: ['10:00 AM', '11:00 AM'],
-    afternoon: ['2:00 PM', '3:00 PM', '4:00 PM']
-  },
-  '2025-02-23': {
-    morning: ['9:00 AM', '10:00 AM'],
-    afternoon: ['1:00 PM', '2:00 PM', '3:00 PM']
-  }
-};
-
-const BookingForm: React.FC<BookingFormProps> = ({ type, celebrity }) => {
+const BookingForm: React.FC<BookingFormProps> = ({ 
+  type, 
+  celebrity,
+  availableSlots = {} // Provide default empty object
+}) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -43,32 +37,40 @@ const BookingForm: React.FC<BookingFormProps> = ({ type, celebrity }) => {
     const month = date.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
-    
+  
+    const today = new Date();
+    const todayLocal = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  
     const days = [];
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(null);
-    }
-    
+    for (let i = 0; i < firstDayOfMonth; i++) days.push(null);
+  
     for (let i = 1; i <= daysInMonth; i++) {
-      const currentDate = new Date(year, month, i);
-      const formattedDate = currentDate.toISOString().split('T')[0];
+      const localDate = new Date(year, month, i);
+      const utcDate = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
+      
       days.push({
         date: i,
-        fullDate: formattedDate,
-        hasSlots: availableSlots[formattedDate] !== undefined,
-        isToday: new Date().toISOString().split('T')[0] === formattedDate
+        fullDate: utcDate.toISOString().split('T')[0], // UTC date for backend lookup
+        hasSlots: availableSlots[utcDate.toISOString().split('T')[0]] !== undefined,
+        isToday: `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}` === todayLocal
       });
     }
-    
+  
     return days;
   };
 
-  const formatDisplayDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
+  const formatDisplayDate = (utcDate: string) => {
+    const date = new Date(`${utcDate}T00:00:00Z`);
+    return `${date.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC'
+    })} (UTC) → ${date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
       day: 'numeric'
-    });
+    })} (Your Time)`;
   };
 
   const handleDateSelect = (fullDate: string) => {
@@ -85,6 +87,42 @@ const BookingForm: React.FC<BookingFormProps> = ({ type, celebrity }) => {
     const slots = availableSlots[date];
     return Object.values(slots).reduce((total, timeSlots) => total + timeSlots.length, 0);
   };
+
+  const parseUTCTime = (timeStr: string) => {
+    // Handles both "HH:mm" and "HH:mm AM/PM" formats
+    const [timePart, modifier] = timeStr.split(' ');
+    const [hoursStr, minutesStr] = timePart.split(':');
+    
+    let hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+  
+    if (modifier) {
+      if (modifier === 'PM' && hours < 12) hours += 12;
+      if (modifier === 'AM' && hours === 12) hours = 0;
+    }
+  
+    return { hours, minutes };
+  };
+  
+  const convertUTCTimeToLocal = (utcTime: string, selectedUTCDate: string) => {
+    const { hours, minutes } = parseUTCTime(utcTime);
+    const utcDateTime = new Date(`${selectedUTCDate}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`);
+    
+    return {
+      localTime: utcDateTime.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }),
+      localDate: utcDateTime.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      })
+    };
+  };
+  
+
+
 
   const renderBookingTypeInfo = () => {
     if (type !== 'meeting') return null;
@@ -230,22 +268,35 @@ const BookingForm: React.FC<BookingFormProps> = ({ type, celebrity }) => {
             <div key={period}>
               <h4 className="text-sm font-medium text-gray-400 mb-3 capitalize">{period}</h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {times.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => handleTimeSelect(time)}
-                    className={`
-                      p-4 rounded-lg text-sm font-medium transition-all duration-200
-                      ${selectedTime === time 
-                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-500 ring-offset-2 ring-offset-gray-900 scale-105 transform' 
-                        : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105 transform'
-                      }
-                    `}
-                  >
-                    <Clock className="w-4 h-4 mx-auto mb-2" />
-                    {time}
-                  </button>
-                ))}
+{times.map((time: string) => {
+  const { localTime, localDate } = convertUTCTimeToLocal(time, selectedDate);
+  const isDifferentDate = localDate !== new Date(selectedDate).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+
+  return (
+    <button
+      key={time}
+      onClick={() => handleTimeSelect(time)}
+      className={`
+        p-4 rounded-lg text-sm font-medium transition-all duration-200
+        ${selectedTime === time 
+          ? 'bg-emerald-600 text-white ring-2 ring-emerald-500 ring-offset-2 ring-offset-gray-900 scale-105 transform' 
+          : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105 transform'
+        }
+      `}
+    >
+      <Clock className="w-4 h-4 mx-auto mb-2" />
+      {localTime}
+      {isDifferentDate && (
+        <span className="block text-xs text-gray-400 mt-1">
+          ({localDate})
+        </span>
+      )}
+    </button>
+  );
+})}
               </div>
             </div>
           ))}

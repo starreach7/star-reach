@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Clock, Tag, MessageCircle, Video , X} from 'lucide-react';
 import BookingForm from '../components/BookingForm';
 import ReelsSection from '../components/ReelsSection';
@@ -10,12 +10,21 @@ import { useQuery } from '@tanstack/react-query';
 import CelebrityService from '../services/api/celebrity.service';
 import { useAuth } from '../store/authStore';
 
+interface TimeSlot {
+  morning: string[];
+  afternoon: string[];
+}
+
+interface AvailableSlots {
+  [key: string]: TimeSlot;
+}
+
 const CelebrityProfile = () => {
   const { id } = useParams();
   const [showVideoModal, setShowVideoModal] = useState(false);
-  
   const [bookingType, setBookingType] = useState<'personal' | 'business' | 'meeting'>('personal');
   const { user } = useAuth();
+  const [availableSlots, setAvailableSlots] = useState<AvailableSlots>({});
 
   const { data: celebrityData, isLoading, error } = useQuery({
     queryKey: ['celebrity', id],
@@ -25,13 +34,59 @@ const CelebrityProfile = () => {
 
   const celebrity = celebrityData?.data;
 
-  // In CelebrityProfile.tsx, replace the loading return statement with:
+  const transformMeetingSchedules = (schedules: string[]): AvailableSlots => {
+    const slots: AvailableSlots = {};
+    
+    schedules.forEach(schedule => {
+      const date = new Date(schedule);
+      
+      // Format the date key (YYYY-MM-DD)
+      const dateKey = date.toISOString().split('T')[0];
+      
+      // Format time (HH:MM AM/PM)
+      const timeString = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }).toUpperCase();
+      
+      // Initialize the date entry if it doesn't exist
+      if (!slots[dateKey]) {
+        slots[dateKey] = {
+          morning: [],
+          afternoon: []
+        };
+      }
+      
+      // Determine if it's morning or afternoon
+      const hour = date.getHours();
+      if (hour < 12) {
+        slots[dateKey].morning.push(timeString);
+      } else {
+        slots[dateKey].afternoon.push(timeString);
+      }
+      
+      // Sort the times
+      slots[dateKey].morning.sort();
+      slots[dateKey].afternoon.sort();
+    });
+    
+    return slots;
+  };
+
+  useEffect(() => {
+    if (celebrity?.meetingSchedules) {
+      const transformedSlots = transformMeetingSchedules(celebrity.meetingSchedules);
+      setAvailableSlots(transformedSlots);
+    }
+  }, [celebrity?.meetingSchedules]);
+
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 pt-20 pb-12">
         {/* Video Modal */}
-
+  
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section Skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
@@ -42,7 +97,7 @@ const CelebrityProfile = () => {
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-800 animate-pulse rounded-full"></div>
               </div>
             </div>
-
+  
             {/* Profile Info Skeleton */}
             <div className="lg:col-span-9 text-center lg:text-left">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
@@ -64,7 +119,7 @@ const CelebrityProfile = () => {
               </div>
             </div>
           </div>
-
+  
           {/* Main Content Skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column */}
@@ -81,7 +136,7 @@ const CelebrityProfile = () => {
                   <div className="h-12 bg-gray-700 rounded-lg"></div>
                 </div>
               </div>
-
+  
               {/* Videos Section Skeleton */}
               <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
                 <div className="h-8 w-48 bg-gray-700 rounded-lg mb-6"></div>
@@ -91,7 +146,7 @@ const CelebrityProfile = () => {
                   ))}
                 </div>
               </div>
-
+  
               {/* Reviews Section Skeleton */}
               <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
                 <div className="h-8 w-48 bg-gray-700 rounded-lg mb-6"></div>
@@ -111,7 +166,7 @@ const CelebrityProfile = () => {
                 </div>
               </div>
             </div>
-
+  
             {/* Right Column */}
             <div className="space-y-6">
               <div className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
@@ -132,7 +187,6 @@ const CelebrityProfile = () => {
     );
   }
 
-
   if (error || !celebrity) {
     return (
       <div className="min-h-screen bg-gray-900 pt-20 pb-12">
@@ -149,7 +203,7 @@ const CelebrityProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 pt-20 pb-12">
-            {showVideoModal && (
+      {showVideoModal && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
             <button
@@ -179,7 +233,7 @@ const CelebrityProfile = () => {
                 alt={celebrity.fullName}
                 className="w-full h-full rounded-full object-cover border-2 border-emerald-500 shadow-lg shadow-emerald-500/20"
               />
-              <div  className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-0.5 rounded-full text-sm font-medium cursor-pointer hover:bg-emerald-600 transition-colors"  onClick={() => setShowVideoModal(true)}>
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-0.5 rounded-full text-sm font-medium cursor-pointer hover:bg-emerald-600 transition-colors">
                 {celebrity.categoryName}
               </div>
             </div>
@@ -225,7 +279,7 @@ const CelebrityProfile = () => {
             </div>
 
             <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-              {celebrity.tags?.map((tag: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined, index: React.Key | null | undefined) => (
+              {celebrity.tags?.map((tag: string, index: number) => (
                 <span
                   key={index}
                   className="flex items-center gap-1 bg-gray-800/50 text-gray-300 px-3 py-1 rounded-full text-sm hover:bg-gray-700 transition-colors border border-gray-700"
@@ -246,30 +300,33 @@ const CelebrityProfile = () => {
               <div className="grid grid-cols-3 gap-3 mb-6">
                 <button
                   onClick={() => setBookingType('personal')}
-                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${bookingType === 'personal'
+                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                    bookingType === 'personal'
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-                    }`}
+                  }`}
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>Personal</span>
                 </button>
                 <button
                   onClick={() => setBookingType('business')}
-                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${bookingType === 'business'
+                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                    bookingType === 'business'
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-                    }`}
+                  }`}
                 >
                   <Tag className="w-4 h-4" />
                   <span>Business</span>
                 </button>
                 <button
                   onClick={() => setBookingType('meeting')}
-                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${bookingType === 'meeting'
+                  className={`py-2.5 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                    bookingType === 'meeting'
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-                    }`}
+                  }`}
                 >
                   <Video className="w-4 h-4" />
                   <span>Meeting</span>
@@ -286,6 +343,7 @@ const CelebrityProfile = () => {
                     meeting: Number(celebrity.meetingPrice) || 0,
                   },
                 }}
+                availableSlots={availableSlots}
               />
             </div>
 
