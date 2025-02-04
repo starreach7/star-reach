@@ -5,7 +5,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
-        sw: './public/firebase-notifications-sw.js'
+        sw: './public/firebase-messaging-sw.js'
       }
     }
   }
