@@ -27,8 +27,8 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/vite.svg', // Replace with your app's icon
-    badge: '/vite.svg', // Replace with your app's badge
+    icon: '/vite.svg',
+    badge: '/vite.svg'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

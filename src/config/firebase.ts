@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
+import { getMessaging, onMessage } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBnuGzzPBC07axqtfTiS1Bf1iOsn3ezSKY",
@@ -14,3 +15,18 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
+
+// Initialize Firebase Cloud Messaging
+export const messaging = getMessaging(app);
+
+// Handle incoming messages while the app is in the foreground
+onMessage(messaging, (payload) => {
+  console.log('Message received:', payload);
+  // You can show a notification here using the Notification API
+  if (Notification.permission === 'granted') {
+    new Notification(payload.notification?.title || 'New Message', {
+      body: payload.notification?.body,
+      icon: '/vite.svg'
+    });
+  }
+});

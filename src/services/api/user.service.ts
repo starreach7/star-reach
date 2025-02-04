@@ -2,6 +2,7 @@ import api from './axios';
 import AuthService from './auth.service';
 import { useAuth } from '../../store/authStore';
 import NotificationService from './firebase/notification.service';
+
 class UserService {
     async uploadFile(file: File): Promise<string> {
         try {
@@ -21,18 +22,27 @@ class UserService {
 
     async updateUser(data: any): Promise<void> {
         try {
-            // Get FCM token
-            const fcmToken = await NotificationService.getFCMToken();
-
-            if (data.profile instanceof File) {
-                const videoUrl = await this.uploadFile(data.profile);
-                data.profile = videoUrl;
+            let fcmToken = null;
+            
+            // Try to get FCM token, but don't block if it fails
+            try {
+                fcmToken = await NotificationService.getFCMToken();
+            } catch (err) {
+                console.warn('Failed to get FCM token:', err);
             }
 
             const formData = new FormData();
 
-            // Append form fields to FormData
-            formData.append('profileImage', data.profile.data ? data.profile.data : data.profile || '');
+            // Only upload new profile image if it's a File object
+            if (data.profile instanceof File) {
+                const videoUrl = await this.uploadFile(data.profile);
+                formData.append('profileImage', videoUrl.data);
+            } else if (data.profile) {
+                // If it's a URL string, just pass it along
+                formData.append('profileImage', data.profile);
+            }
+
+            // Append other form fields to FormData
             formData.append('firstName', data.firstName);
             formData.append('lastName', data.lastName);
             formData.append('email', data.email);

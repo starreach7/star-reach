@@ -6,7 +6,17 @@ class NotificationService {
 
   async getFCMToken(): Promise<string | null> {
     try {
-      // First request notification permission
+      // First check if service worker is supported
+      if (!('serviceWorker' in navigator)) {
+        console.log('Service workers are not supported');
+        return null;
+      }
+
+      // Register service worker
+      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      await navigator.serviceWorker.ready;
+
+      // Request notification permission
       const permission = await this.requestNotificationPermission();
       if (!permission) {
         console.log('Notification permission denied');
@@ -15,14 +25,15 @@ class NotificationService {
 
       // Get registration token
       const currentToken = await getToken(this.messaging, {
-        vapidKey: 'BC_ZmVC6oE-6UGuk7NgDQ75odDuEp_OxLUmPc1j2_elZ1-cZGo-ZSwAhMb2sto3k0TLYfTyChTmP8HqSk-0Wnig' // Replace with your VAPID key from Firebase console
-});
+        vapidKey: 'BC_ZmVC6oE-6UGuk7NgDQ75odDuEp_OxLUmPc1j2_elZ1-cZGo-ZSwAhMb2sto3k0TLYfTyChTmP8HqSk-0Wnig',
+        serviceWorkerRegistration: registration
+      });
 
       if (currentToken) {
         console.log('FCM token:', currentToken);
         return currentToken;
       } else {
-        console.log('No registration token available. Request permission to generate one.');
+        console.log('No registration token available.');
         return null;
       }
     } catch (err) {
