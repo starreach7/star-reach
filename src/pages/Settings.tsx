@@ -46,7 +46,7 @@ const Settings = () => {
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    setProfile(file)
+    setProfile(file || null);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
