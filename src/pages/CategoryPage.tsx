@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, Star, Users, Clock } from 'lucide-react';
 import CelebrityCard from '../components/CelebrityCard';
 import FilterSidebar from '../commonComponents/FilterSidebar';
 import { useCategories } from '../store/categoryStore';
@@ -33,11 +33,11 @@ const CategoryPage = () => {
       maxPrice: selectedPriceRange.max || undefined,
       ratings: selectedRatings.length > 0 ? selectedRatings : undefined,
       sortBy: selectedSort || undefined,
-      categoryId: categoryId // Add categoryId to the API call
+      categoryId: categoryId
     }),
   });
 
-  const category = categories.find(c => c.id === Number(categoryId));
+  const category = categories.find(c => c.name.toLowerCase() === categoryId?.toLowerCase());
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected);
@@ -45,7 +45,7 @@ const CategoryPage = () => {
 
   const handlePriceRangeChange = (range: { min: string; max: string }) => {
     setSelectedPriceRange(range);
-    setCurrentPage(0); // Reset to first page
+    setCurrentPage(0);
   };
 
   const handleRatingChange = (rating: number) => {
@@ -54,25 +54,76 @@ const CategoryPage = () => {
         ? prev.filter(r => r !== rating)
         : [...prev, rating]
     );
-    setCurrentPage(0); // Reset to first page
+    setCurrentPage(0);
   };
 
   const handleSortChange = (sort: string) => {
     setSelectedSort(sort === selectedSort ? '' : sort);
-    setCurrentPage(0); // Reset to first page
+    setCurrentPage(0);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(0); // Reset to first page
+    setCurrentPage(0);
   };
 
   if (categoriesLoading) {
     return (
       <div className="min-h-screen bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="h-8 w-48 bg-gray-800 rounded animate-pulse"></div>
-          <div className="h-4 w-64 bg-gray-800 rounded animate-pulse mt-4"></div>
+          {/* Category Header Skeleton */}
+          <div className="mb-12">
+            <div className="h-12 w-64 bg-gray-800 rounded-lg animate-pulse mb-4"></div>
+            <div className="h-4 w-96 bg-gray-800 rounded animate-pulse"></div>
+          </div>
+
+          {/* Search and Filter Header Skeleton */}
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div className="w-full md:w-2/3 mb-4 md:mb-0">
+              <div className="h-12 bg-gray-800 rounded-lg animate-pulse"></div>
+            </div>
+            <div className="h-10 w-28 bg-gray-800 rounded-lg animate-pulse"></div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Filters Sidebar Skeleton */}
+            <div className="lg:w-1/4 space-y-6">
+              <div className="bg-gray-800 rounded-xl p-6 animate-pulse space-y-4">
+                <div className="h-6 w-32 bg-gray-700 rounded"></div>
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-10 bg-gray-700 rounded"></div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-xl p-6 animate-pulse space-y-4">
+                <div className="h-6 w-32 bg-gray-700 rounded"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-10 bg-gray-700 rounded"></div>
+                  <div className="h-10 bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Celebrity Grid Skeleton */}
+            <div className="lg:w-3/4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-gray-800 rounded-xl overflow-hidden animate-pulse">
+                    <div className="h-64 bg-gray-700"></div>
+                    <div className="p-6 space-y-4">
+                      <div className="h-6 w-3/4 bg-gray-700 rounded"></div>
+                      <div className="h-4 w-1/2 bg-gray-700 rounded"></div>
+                      <div className="flex justify-between items-center">
+                        <div className="h-8 w-20 bg-gray-700 rounded"></div>
+                        <div className="h-10 w-24 bg-gray-700 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -154,19 +205,13 @@ const CategoryPage = () => {
                     <CelebrityCard
                       key={celebrity.celebrityId}
                       celebrity={{
-                        id: parseInt(celebrity.celebrityId),
-                        name: celebrity.fullName,
-                        image: celebrity.profileImage,
-                        category: celebrity.categoryName,
-                        price: parseFloat(celebrity.price),
-                        rating: celebrity.averageRating,
-                        reviews: 0,
-                        bookings: 0,
-                        stats: {
-                          completed: '0',
-                          avgResponse: 'N/A',
-                          joinedDate: 'Recently'
-                        }
+                        fullName: celebrity.fullName,
+                        profileImage: celebrity.profileImage,
+                        categoryName: celebrity.categoryName,
+                        price: celebrity.price,
+                        averageRating: celebrity.averageRating,
+                        celebrityId: celebrity.celebrityId,
+                        userId: celebrity.userId,
                       }}
                     />
                   ))}
@@ -179,7 +224,7 @@ const CategoryPage = () => {
                     nextLabel="Next"
                     pageCount={data?.totalPages || 2}
                     onPageChange={handlePageChange}
-                    containerClassName="flex justify-center items-center space-x-2"
+                    containerClassName="flex flex-wrap justify-center items-center gap-2"
                     previousClassName="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                     nextClassName="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                     pageClassName="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
