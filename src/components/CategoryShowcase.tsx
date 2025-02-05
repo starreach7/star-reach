@@ -62,7 +62,7 @@ const CategoryShowcase = () => {
             return (
               <Link
                 key={category.id}
-                to={`/categories/${category.id}`}
+                to={`/categories/${category.name}`}
                 className="group relative overflow-hidden rounded-xl bg-gray-800 p-6 text-center hover:bg-gray-750 transition duration-300"
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-emerald-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
