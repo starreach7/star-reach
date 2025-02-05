@@ -1,16 +1,7 @@
 import React, { useEffect } from 'react';
-import { Clapperboard, Music, Trophy, TrendingUp, Laugh, Tv } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCategories } from '../store/categoryStore';
-
-// const iconMap: { [key: string]: any } = {
-//   clapperboard: Clapperboard,
-//   music: Music,
-//   trophy: Trophy,
-//   'trending-up': TrendingUp,
-//   laugh: Laugh,
-//   tv: Tv,
-// };
+import { getCategoryIcon } from '../utils/categoryIcons';
 
 const Categories = () => {
   const { categories, loading, error, fetchCategories } = useCategories();
@@ -59,7 +50,7 @@ const Categories = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category) => {
-            // const IconComponent = iconMap[category.icon];
+            const IconComponent = getCategoryIcon(category.name);
             return (
               <div
                 key={category.id}
@@ -67,7 +58,7 @@ const Categories = () => {
               >
                 <div className="flex items-start space-x-4">
                   <div className="p-3 bg-emerald-900/30 rounded-xl">
-                    <TrendingUp className="w-8 h-8 text-emerald-400" />
+                    <IconComponent className="w-8 h-8 text-emerald-400" />
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
@@ -76,7 +67,10 @@ const Categories = () => {
                       <span className="text-sm text-gray-500">
                         {category.celebrityCount} celebrities
                       </span>
-                      <Link to={`${category.name}`} className="text-emerald-400 hover:text-emerald-300 font-medium" >
+                      <Link 
+                        to={`${category.name}`} 
+                        className="text-emerald-400 hover:text-emerald-300 font-medium"
+                      >
                         Browse All →
                       </Link>
                     </div>

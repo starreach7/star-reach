@@ -1,12 +1,12 @@
 import React from 'react';
-
-import { Star, Video, Gift, TrendingUp, Search, ArrowRight } from 'lucide-react';
+import { Star, Video, Gift, TrendingUp, ArrowRight } from 'lucide-react';
 import HowItWorks from '../components/HowItWorks';
-import { featuredCelebrities, trendingCelebrities, categories } from '../data/mockData';
+import { featuredCelebrities, trendingCelebrities } from '../data/mockData';
 import TrendingCreators from '../components/TrendingCreators';
 import FeaturedTalent from '../components/FaeturedTalent';
 import CategoryShowcase from '../components/CategoryShowcase';
 import { Link } from 'react-router-dom';
+import SearchBar from '../components/SearchBar';
 
 function Home() {
   return (
@@ -22,19 +22,7 @@ function Home() {
             <p className="text-xl text-gray-300 mb-8">
               Book personalized video shoutouts from celebrities, influencers, and creators
             </p>
-            <div className="relative max-w-2xl mx-auto">
-              <div className="flex items-center bg-gray-800 rounded-lg p-2">
-                <Search className="w-6 h-6 text-gray-400 ml-2" />
-                <input
-                  type="text"
-                  placeholder="Search for your favorite celebrity..."
-                  className="w-full bg-transparent border-none focus:ring-0 text-gray-100 placeholder-gray-400 px-4 py-2"
-                />
-                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md transition duration-200">
-                  Search
-                </button>
-              </div>
-            </div>
+            <SearchBar />
           </div>
         </div>
       </section>
@@ -68,8 +56,8 @@ function Home() {
         </div>
       </section>
 
-       {/* Categories Showcase */}
-       <CategoryShowcase categories={categories} />
+      {/* Categories Showcase */}
+      <CategoryShowcase />
 
       {/* How It Works Section */}
       <HowItWorks />
@@ -80,9 +68,8 @@ function Home() {
       {/* Trending Celebrities */}
       <TrendingCreators celebrities={trendingCelebrities}/>
 
-
-       {/* CTA Section */}
-       <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900">
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Create Unforgettable Moments?</h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">

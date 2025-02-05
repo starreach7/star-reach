@@ -1,16 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Clapperboard, Music, Trophy, TrendingUp, Laugh, Tv } from 'lucide-react';
 import { useCategories } from '../store/categoryStore';
-
-const iconMap: { [key: string]: any } = {
-  clapperboard: Clapperboard,
-  music: Music,
-  trophy: Trophy,
-  'trending-up': TrendingUp,
-  laugh: Laugh,
-  tv: Tv,
-};
+import { getCategoryIcon } from '../utils/categoryIcons';
 
 const CategoryShowcase = () => {
   const { categories, loading, error, fetchCategories } = useCategories();
@@ -58,7 +49,7 @@ const CategoryShowcase = () => {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category) => {
-            // const IconComponent = iconMap[category.icon];
+            const IconComponent = getCategoryIcon(category.name);
             return (
               <Link
                 key={category.id}
@@ -68,7 +59,7 @@ const CategoryShowcase = () => {
                 <div className="absolute inset-0 bg-gradient-to-b from-emerald-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative z-10">
                   <div className="mx-auto mb-4 w-12 h-12 bg-emerald-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <TrendingUp className="w-6 h-6 text-emerald-400" />
+                    <IconComponent className="w-6 h-6 text-emerald-400" />
                   </div>
                   <h3 className="text-lg font-semibold mb-1">{category.name}</h3>
                   <p className="text-sm text-gray-400">{category.celebrityCount} creators</p>
