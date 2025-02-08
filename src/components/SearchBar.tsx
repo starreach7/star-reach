@@ -49,7 +49,7 @@ const SearchBar = () => {
 
       {/* Enhanced Search Results Dropdown */}
       {isOpen && searchQuery.length > 2 && (
-        <div className="absolute z-50 w-full mt-4 bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-700/50 max-h-[32rem] overflow-y-auto divide-y divide-gray-700/50">
+        <div className=" z-[100] w-full mt-4 bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-700/50 max-h-[32rem] overflow-y-auto divide-y divide-gray-700/50">
           {/* Search Header */}
           <div className="px-4 py-3 bg-emerald-900/20 border-b border-emerald-800/30">
             <div className="flex items-center justify-between">
