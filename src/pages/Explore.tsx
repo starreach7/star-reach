@@ -173,7 +173,7 @@ const Explore = () => {
                     forcePage={currentPage}
                     previousLabel="Previous"
                     nextLabel="Next"
-                    pageCount={data?.totalPages || 2}
+                    pageCount={data?.totalPage}
                     onPageChange={handlePageChange}
                     containerClassName="flex flex-wrap justify-center items-center gap-2"
                     previousClassName="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"

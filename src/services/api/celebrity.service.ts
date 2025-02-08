@@ -126,7 +126,7 @@ class CelebrityService {
         }
 
       const response = await api.get(`/user/celebrities?${queryParams.toString()}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       throw this.handleError(error);
     }

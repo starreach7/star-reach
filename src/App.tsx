@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { useAuth } from './store/authStore';
+import socketService from './services/api/socket.service';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -20,6 +23,20 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
 function App() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Initialize socket connection when user is logged in
+    if (user?.id) {
+      socketService.initialize(user.id);
+    }
+
+    // Cleanup socket connection on unmount or when user logs out
+    return () => {
+      socketService.disconnect();
+    };
+  }, [user?.id]);
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-900 text-gray-100">

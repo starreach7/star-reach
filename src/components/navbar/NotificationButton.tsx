@@ -1,17 +1,11 @@
 import React from 'react';
 import { Bell } from 'lucide-react';
 import NotificationsPopover from './NotificationPopover';
+import { useNotificationStore } from '../../store/notificationStore';
 
 interface NotificationButtonProps {
   showNotifications: boolean;
   setShowNotifications: (show: boolean) => void;
-  notifications: Array<{
-    id: number;
-    title: string;
-    message: string;
-    time: string;
-    read: boolean;
-  }>;
   className?: string;
   isMobile?: boolean;
 }
@@ -19,11 +13,10 @@ interface NotificationButtonProps {
 const NotificationButton: React.FC<NotificationButtonProps> = ({
   showNotifications,
   setShowNotifications,
-  notifications,
   className = "",
   isMobile = false
 }) => {
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const { unreadCount } = useNotificationStore();
 
   return (
     <div className={`relative ${className}`}>
@@ -34,12 +27,11 @@ const NotificationButton: React.FC<NotificationButtonProps> = ({
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount}
+            {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
       <NotificationsPopover
-        notifications={notifications}
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
         isMobile={isMobile}
