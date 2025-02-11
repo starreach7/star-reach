@@ -18,7 +18,6 @@ interface NotificationState {
 	addNotification: (notification: Notification) => void;
 	markNotificationAsRead: (id: string) => void;
 	markAllAsRead: () => void;
-	clearNotifications: () => void;
 	removeNotification: (id: string) => void;
 	setInitialNotifications: (notifications: Notification[]) => void;
 }
@@ -61,9 +60,7 @@ export const useNotificationStore = create<NotificationState>()(
 				}));
 			},
 
-			clearNotifications: () => {
-				set({ notifications: [], unreadCount: 0 });
-			},
+	
 
 			removeNotification: (id) => {
 				set((state) => {

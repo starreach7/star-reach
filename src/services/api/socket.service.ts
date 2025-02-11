@@ -10,12 +10,6 @@ class SocketService {
 		if (this.initialized) return;
 
 		try {
-			// Fetch initial notifications
-			// const response = await api.get("/user/notifications");
-			// const { addNotification, setInitialNotifications } =
-			// 	useNotificationStore.getState();
-			// setInitialNotifications(response.data.data);
-
 			// Initialize socket connection
 			this.socket = io(
 				import.meta.env.VITE_SOCKET_URL || "https://starreach.onrender.com",
@@ -48,28 +42,17 @@ class SocketService {
 
 		// Notification events
 		this.socket.on("notification", (notification) => {
-			console.log("notification ", notification);
 			const { setInitialNotifications } = useNotificationStore.getState();
 			setInitialNotifications(notification);
-			// const { addNotification } = useNotificationStore.getState();
-			// addNotification(notification);
 		});
 
 		this.socket.on("new-notification", (notification) => {
-			console.log("new notififcation ", notification);
 			const { addNotification } = useNotificationStore.getState();
 			addNotification(notification);
 		});
 
-		this.socket.on("notification_read", (notificationId) => {
-			const { markNotificationAsRead } = useNotificationStore.getState();
-			markNotificationAsRead(notificationId);
-		});
+		
 
-		this.socket.on("notifications_clear", () => {
-			const { clearNotifications } = useNotificationStore.getState();
-			clearNotifications();
-		});
 	}
 
 	disconnect() {
@@ -82,14 +65,18 @@ class SocketService {
 
 	// Mark a notification as read
 	async markNotificationAsRead(notificationId: string) {
-		try {
-			await api.put(`/user/notifications/${notificationId}/read`);
-			const { markNotificationAsRead } = useNotificationStore.getState();
-			markNotificationAsRead(notificationId);
-		} catch (error) {
-			console.error("Failed to mark notification as read:", error);
-		}
-	}
+        try {
+            // Send the read event to server with the notification ID
+            this.socket?.emit("notification_read", notificationId);
+            
+            // Optimistically update the local state
+            const { markNotificationAsRead } = useNotificationStore.getState();
+            markNotificationAsRead(notificationId);
+
+        } catch (error) {
+            console.error("Failed to mark notification as read:", error);
+        }
+    }
 
 	// Mark all notifications as read
 	async markAllNotificationsAsRead() {
