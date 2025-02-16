@@ -21,6 +21,7 @@ import EditPricing from './pages/EditPricing';
 import Settings from './pages/Settings';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Business from './pages/Business';
 
 function App() {
   const { user } = useAuth();
@@ -45,6 +46,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/business" element={<Business />} />
           <Route path="/categories/:categoryId" element={<CategoryPage />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/become-creator" element={<BecomeCreator />} />
@@ -76,8 +78,14 @@ function App() {
         <Footer />
         <Toaster
           position="top-right"
+          containerStyle={{
+            position: 'fixed',
+            zIndex: 9999,
+            top: '80px',
+            right: '20px',
+          }}
           toastOptions={{
-            duration: 5000,
+            duration: 3000,
             style: {
               background: '#1f2937',
               color: '#fff',

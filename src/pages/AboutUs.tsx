@@ -1,33 +1,50 @@
-import { Globe, Users, Star, TrendingUp, Heart, Gift } from 'lucide-react';
+import { Globe, Users, Star, TrendingUp, Heart, Gift, Shield, Sparkles, Video, DollarSign, Building2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const About = () => {
-  const stats = [
-    { number: '500K+', label: 'Happy Customers', icon: Users },
-    { number: '50K+', label: 'Talented Creators', icon: Star },
-    { number: '180+', label: 'Countries Reached', icon: Globe },
-    { number: '1M+', label: 'Moments Created', icon: Heart }
-  ];
-
   const values = [
     {
       icon: Users,
       title: 'Community First',
-      description: 'We build meaningful connections between creators and their biggest fans'
+      description: 'Building a platform where creators and fans can connect authentically'
     },
     {
       icon: Star,
       title: 'Quality Experience',
-      description: 'Every interaction on our platform is designed to be memorable and special'
+      description: 'Every interaction is designed to create memorable moments'
     },
     {
       icon: Gift,
       title: 'Unique Moments',
-      description: 'We enable personal, one-of-a-kind experiences that last a lifetime'
+      description: 'Enabling personal, one-of-a-kind experiences that last a lifetime'
     },
     {
-      icon: TrendingUp,
-      title: 'Creator Success',
-      description: 'We empower creators to build sustainable careers doing what they love'
+      icon: Shield,
+      title: 'Trust & Safety',
+      description: 'Ensuring secure and reliable interactions for everyone'
+    }
+  ];
+
+  const features = [
+    {
+      icon: Video,
+      title: 'Personalized Videos',
+      description: 'Custom video messages from creators to their fans'
+    },
+    {
+      icon: Users,
+      title: 'Live Meetings',
+      description: '1-on-1 video calls with your favorite creators'
+    },
+    {
+      icon: Building2,
+      title: 'Business Solutions',
+      description: 'Professional content for marketing and events'
+    },
+    {
+      icon: Heart,
+      title: 'Fan Engagement',
+      description: 'Meaningful interactions that go beyond social media'
     }
   ];
 
@@ -39,28 +56,11 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">
-              Connecting Fans with Their Favorite Stars
+              Reimagining Creator-Fan Connections
             </h1>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              We're building the most personal creator economy platform, where authentic connections happen every day
+              We're a passionate startup on a mission to transform how creators connect with their audience through personalized video experiences
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-900/30 rounded-full mb-4">
-                  <stat.icon className="w-8 h-8 text-emerald-400" />
-                </div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-gray-400">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -70,12 +70,16 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
+              <div className="inline-flex items-center bg-emerald-900/30 rounded-full px-4 py-2 mb-6">
+                <Sparkles className="w-5 h-5 text-emerald-400 mr-2" />
+                <span className="text-emerald-400 font-medium">Our Story</span>
+              </div>
+              <h2 className="text-3xl font-bold mb-6">Building the Future of Creator Economy</h2>
               <p className="text-gray-300 text-lg mb-6">
-                We believe in creating authentic connections between creators and their biggest fans. Our platform enables meaningful interactions that turn into lifelong memories.
+                StarReach was born from a simple observation: fans want more meaningful connections with their favorite creators, and creators want better ways to engage with their true supporters.
               </p>
               <p className="text-gray-300 text-lg">
-                By empowering creators to monetize their talent and connect with their audience in a personal way, we're building the future of the creator economy.
+                We're building a platform that makes these authentic connections possible through personalized video messages, live interactions, and unique experiences that bring creators and fans closer together.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -86,7 +90,7 @@ const About = () => {
               />
               <img
                 src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop"
-                alt="Happy customer"
+                alt="Creative work"
                 className="rounded-xl mt-12"
               />
             </div>
@@ -100,7 +104,7 @@ const About = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Our Values</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              The principles that guide everything we do
+              The principles that guide us as we build and grow
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -117,65 +121,49 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Features Section */}
       <section className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
+            <h2 className="text-3xl font-bold mb-4">What We Offer</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Passionate individuals working together to create magical moments
+              Innovative ways to create and share memorable moments
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {[1, 2, 3, 4].map((_, index) => (
-              <div key={index} className="text-center">
-                <img
-                  src={`https://images.unsplash.com/photo-${index + 1}?w=300&h=300&fit=crop`}
-                  alt={`Team member ${index + 1}`}
-                  className="w-48 h-48 rounded-full mx-auto mb-4 object-cover"
-                />
-                <h3 className="text-lg font-semibold mb-1">Sarah Johnson</h3>
-                <p className="text-emerald-400 mb-2">Product Lead</p>
-                <p className="text-gray-400 text-sm">
-                  Passionate about creating meaningful connections
-                </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                <div className="w-12 h-12 bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-emerald-400" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-400">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Press Section */}
-      <section className="py-20 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">In the Press</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              What others are saying about us
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-900 rounded-xl p-6">
-              <div className="text-emerald-400 text-lg font-semibold mb-4">TechCrunch</div>
-              <p className="text-gray-300 mb-4">
-                "Revolutionizing how fans connect with their favorite creators"
-              </p>
-              <p className="text-gray-400">January 2024</p>
-            </div>
-            <div className="bg-gray-900 rounded-xl p-6">
-              <div className="text-emerald-400 text-lg font-semibold mb-4">Forbes</div>
-              <p className="text-gray-300 mb-4">
-                "The future of personalized celebrity interactions"
-              </p>
-              <p className="text-gray-400">December 2023</p>
-            </div>
-            <div className="bg-gray-900 rounded-xl p-6">
-              <div className="text-emerald-400 text-lg font-semibold mb-4">The Verge</div>
-              <p className="text-gray-300 mb-4">
-                "Setting new standards in the creator economy"
-              </p>
-              <p className="text-gray-400">November 2023</p>
-            </div>
+      {/* Join Us Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-emerald-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-6">Be Part of Our Journey</h2>
+          <p className="text-xl text-gray-300 mb-8">
+            Whether you're a creator looking to connect with fans or a fan wanting to support your favorite creators, join us in building something special.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/become-creator"
+              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 transition duration-200"
+            >
+              Become a Creator
+            </Link>
+            <Link
+              to="/explore"
+              className="inline-flex items-center justify-center px-8 py-3 border border-emerald-600 text-base font-medium rounded-md text-emerald-400 hover:bg-emerald-600 hover:text-white transition duration-200"
+            >
+              Explore Creators
+            </Link>
           </div>
         </div>
       </section>
