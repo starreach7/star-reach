@@ -19,7 +19,7 @@ interface AuthState {
 
 export const useAuth = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       accessToken: null,
       refreshToken: null,
       user: null,
@@ -65,9 +65,16 @@ export const useAuth = create<AuthState>()(
       },
 
       logout: async () => {
+        const state = get();
+        // Prevent multiple logout calls if already logged out
+        if (!state.accessToken && !state.refreshToken && !state.user) {
+          return;
+        }
+
         set({ loading: true, error: null });
         try {
           await AuthService.logout();
+          // Clear the state immediately after successful logout
           set({ 
             accessToken: null,
             refreshToken: null,
@@ -77,9 +84,15 @@ export const useAuth = create<AuthState>()(
           showSuccessToast('Successfully logged out!');
         } catch (error) {
           const errorMessage = (error as Error).message;
-          set({ error: errorMessage, loading: false });
+          // Even if there's an error, clear the state
+          set({ 
+            accessToken: null,
+            refreshToken: null,
+            user: null,
+            error: errorMessage,
+            loading: false 
+          });
           showErrorToast(errorMessage);
-          throw error;
         }
       },
 
